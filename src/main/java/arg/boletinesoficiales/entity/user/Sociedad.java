@@ -7,10 +7,10 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="sociedades", schema = "[user]")
+@Table(name="sociedad", schema = "[user]")
 @Getter
 @Setter
-public class Sociedades {
+public class Sociedad {
     private static final long serialVersionUID = 1L;
 
     @Id
