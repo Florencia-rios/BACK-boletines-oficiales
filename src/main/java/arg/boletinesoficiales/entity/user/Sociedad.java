@@ -18,10 +18,12 @@ public class Sociedad {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name="mor_user")
-    private String usuario;
+    private String usuario; // M o A
     @Column(name="mor_nro_user")
+    @ColumnDefault(value = "62")
     private String nroUsuario;
     @Column(name="mor_lote")
+    @ColumnDefault(value = "0")
     private String lote;
     @Column(name="mor_codint")
     private int contador;
@@ -32,6 +34,7 @@ public class Sociedad {
     @Column(name="mor_sector")
     private String sector;
     @Column(name="mor_cliente")
+    @ColumnDefault(value = "")
     private String cliente;
     @Column(name="mor_nombre_completo")
     private String nombreCompleto;
