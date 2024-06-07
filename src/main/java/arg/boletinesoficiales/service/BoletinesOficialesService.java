@@ -30,6 +30,7 @@ public class BoletinesOficialesService {
         return dataSociedades;
     }
 
+    // todo chequear valores con tablas maestras
     private Sociedad obetenerDataFinal(List<Entity> entities){
         Sociedad response = new Sociedad();
 
