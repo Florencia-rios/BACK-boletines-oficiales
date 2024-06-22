@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="sociedad", schema = "[user]")
+@Table(name="sociedad")
 @Getter
 @Setter
 public class Sociedad {
@@ -28,11 +28,13 @@ public class Sociedad {
     @Column(name="mor_codint")
     private int contador;
     @Column(name="mor_matriz")
+    @ColumnDefault(value = "AA0029")
     private String matriz;
     @Column(name="mor_sucursal")
+    @ColumnDefault(value = "9999")
     private String sucursal;
     @Column(name="mor_sector")
-    private String sector;
+    private String sector; // PC, para altas, y MD para modificaciones
     @Column(name="mor_cliente")
     @ColumnDefault(value = "")
     private String cliente;
@@ -52,7 +54,8 @@ public class Sociedad {
     @Column(name="mor_telefono")
     private String telefono;
     @Column(name="mor_marca_dire_1")
-    private String marcaDireccion; // S o J, J el domicilio separado
+    @ColumnDefault(value = "S")
+    private String marcaDireccion; // S o J, S el domicilio separado
     @Column(name="mor_calle")
     private String calle;
     @Column(name="mor_numer")
@@ -73,7 +76,7 @@ public class Sociedad {
     @JoinColumn(name="mor_nacionalidad_id")
     private Nacionalidades nacionalidad;
     @Column(name="mor_relacion")
-    private String relacion;
+    private String relacion; // si esta cadado con el integrante anterior, va C
     @OneToOne
     @JoinColumn(name="mor_cargo_id")
     private Cargos cargo;
@@ -102,9 +105,14 @@ public class Sociedad {
     @Column(name="mor_campo_8")
     private String campo8;
     @Column(name="mor_ant_fecha")
+    @ColumnDefault(value = "")
     private String antFecha;  // (aaaammdd o dd/mm/aaaa)
     @Column(name="mor_archivo")
+    @ColumnDefault(value = "")
     private String archivo;
     @Column(name="mor_soc_categoria")
-    private String sociedadCategoria;
+    @ColumnDefault(value = "")
+    private String sociedadCategoria; // Sólo es DOC si la sociedad se disolvió
+    @Column(name = "fecha_insercion_boletin")
+    private String fechaInsercionBoletin;
 }

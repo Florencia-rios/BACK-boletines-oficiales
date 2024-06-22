@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="nacionalidades", schema = "[core]")
+@Table(name="nacionalidades")
 @Getter
 @Setter
 public class Nacionalidades {

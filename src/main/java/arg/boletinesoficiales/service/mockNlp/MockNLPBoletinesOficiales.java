@@ -1,7 +1,6 @@
 package arg.boletinesoficiales.service.mockNlp;
 
 import arg.boletinesoficiales.dto.BoletinOficial;
-import arg.boletinesoficiales.dto.Entity;
 import arg.boletinesoficiales.models.Direccion;
 import arg.boletinesoficiales.models.Entities;
 import arg.boletinesoficiales.models.Persona;
@@ -27,17 +26,13 @@ public class MockNLPBoletinesOficiales {
         return response;
     }
 
-    public List<Entity> extraerEntidades(BoletinOficial boletinOficial){
-        List<Entity> response = new ArrayList<>();
+    public Entities extraerEntidades(BoletinOficial boletinOficial){
 
         // todo hacer un for para recorer las sociedades
-
         // MOCK
-        Entities entities = mock_return_modelo_llm();
+        Entities mockEntities = mock_return_modelo_llm();
 
-
-
-        return response;
+        return mockEntities;
     }
 
     private Entities mock_return_modelo_llm() {
