@@ -42,14 +42,18 @@ public class Sociedad {
     private String nombreCompleto;
     @Column(name="mor_fecha_nac")
     private String fechaNacimiento;  // (aaaammdd o dd/mm/aaaa)
+
     @OneToOne
     @JoinColumn(name="mor_sexo_id")
     private Sexo sexo;
+
     @Column(name="mor_documento1")
     private String documento;
     @Column(name="mor_documento2")
+    @ColumnDefault(value = "")
     private String cedula;
     @Column(name="mor_prov_doc2")
+    @ColumnDefault(value = "")
     private String provinciaEmisionCedula;
     @Column(name="mor_telefono")
     private String telefono;
@@ -64,45 +68,62 @@ public class Sociedad {
     private String pisoDepto;
     @Column(name="mor_loca")
     private String localidad;
+
     @OneToOne
     @JoinColumn(name="mor_prov_id")
     private Provincias provincia;
+
     @Column(name="mor_cp")
     private String codigoPostal;
+
     @OneToOne
     @JoinColumn(name="mor_est_civil_id")
     private EstadoCivil estadoCivil;
+
     @OneToOne
     @JoinColumn(name="mor_nacionalidad_id")
     private Nacionalidades nacionalidad;
+
     @Column(name="mor_relacion")
-    private String relacion; // si esta cadado con el integrante anterior, va C
+    private String relacion; // si esta casado con el integrante anterior, va C
+
     @OneToOne
     @JoinColumn(name="mor_cargo_id")
     private Cargos cargo;
+
     @Column(name="mor_cargo_fecha")
     private String fechaCargo;  // (aaaammdd o dd/mm/aaaa)
+
     @OneToOne
     @JoinColumn(name="mor_cargo_fuente_id")
     private FuenteInformacion fuenteCargo;
+
     @Column(name="mor_ant_codigo")
     @ColumnDefault(value = "XXX")
     private String antCodigo; // siempre es "XXX"
     @Column(name="mor_campo_1")
+    @ColumnDefault(value = "")
     private String campo1;
     @Column(name="mor_campo_2")
+    @ColumnDefault(value = "")
     private String campo2;
     @Column(name="mor_campo_3")
+    @ColumnDefault(value = "")
     private String campo3;
     @Column(name="mor_campo_4")
+    @ColumnDefault(value = "")
     private String campo4;
     @Column(name="mor_campo_5")
+    @ColumnDefault(value = "")
     private String campo5;
     @Column(name="mor_campo_6")
+    @ColumnDefault(value = "")
     private String campo6;
     @Column(name="mor_campo_7")
+    @ColumnDefault(value = "")
     private String campo7;
     @Column(name="mor_campo_8")
+    @ColumnDefault(value = "")
     private String campo8;
     @Column(name="mor_ant_fecha")
     @ColumnDefault(value = "")
@@ -115,4 +136,6 @@ public class Sociedad {
     private String sociedadCategoria; // Sólo es DOC si la sociedad se disolvió
     @Column(name = "fecha_insercion_boletin")
     private String fechaInsercionBoletin;
+    @Column(name = "boletin_oficial") // Doc en base 64
+    private String boletinOficial;
 }

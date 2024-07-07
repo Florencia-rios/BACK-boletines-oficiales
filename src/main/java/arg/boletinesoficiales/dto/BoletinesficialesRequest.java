@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class BoletinesficialesRequest {
 
-    private List<BoletinOficial> boletinesOficiales;
+    private List<String> boletinesOficiales;
 }

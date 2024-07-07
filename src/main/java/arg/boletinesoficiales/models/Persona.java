@@ -6,20 +6,33 @@ import lombok.Data;
 @Data
 public class Persona {
 
-    @JsonProperty("nombre_completo")
-    private String nombrePersona;
-    @JsonProperty("documento")
-    private String documento;
+    @JsonProperty("nombre")
+    private String nombre;
+
     @JsonProperty("sexo")
     private String sexo;
-    @JsonProperty("fecha_nacimiento")
+
+    @JsonProperty("documento")
+    private String documento;
+
+    @JsonProperty("fechaNacimiento")
     private String fechaNacimiento;
+
     @JsonProperty("nacionalidad")
     private String nacionalidad;
-    @JsonProperty("estado_civil")
+
+    @JsonProperty("estadoCivil")
     private String estadoCivil;
+
     @JsonProperty("cargo")
     private String cargo;
+
     @JsonProperty("direccion")
     private Direccion direccion;
+
+    @JsonProperty("esBaja")
+    private String esBaja;
+
+    @JsonProperty("casadoConIntegrante")
+    private String casadoConIntegrante;
 }
