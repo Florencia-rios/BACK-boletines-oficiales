@@ -42,11 +42,9 @@ public class Sociedad {
     private String nombreCompleto;
     @Column(name="mor_fecha_nac")
     private String fechaNacimiento;  // (aaaammdd o dd/mm/aaaa)
-
     @OneToOne
     @JoinColumn(name="mor_sexo_id")
     private Sexo sexo;
-
     @Column(name="mor_documento1")
     private String documento;
     @Column(name="mor_documento2")
@@ -68,11 +66,9 @@ public class Sociedad {
     private String pisoDepto;
     @Column(name="mor_loca")
     private String localidad;
-
     @OneToOne
     @JoinColumn(name="mor_prov_id")
     private Provincias provincia;
-
     @Column(name="mor_cp")
     private String codigoPostal;
 
@@ -94,9 +90,9 @@ public class Sociedad {
     @Column(name="mor_cargo_fecha")
     private String fechaCargo;  // (aaaammdd o dd/mm/aaaa)
 
-    @OneToOne
-    @JoinColumn(name="mor_cargo_fuente_id")
-    private FuenteInformacion fuenteCargo;
+    @Column(name="mor_cargo_fuente_id")
+    @ColumnDefault(value = "BOL")
+    private String fuenteCargo; // sólo si el integrante correspondiente se dió de baja en la sociedad, va BAJ
 
     @Column(name="mor_ant_codigo")
     @ColumnDefault(value = "XXX")
@@ -137,5 +133,5 @@ public class Sociedad {
     @Column(name = "fecha_insercion_boletin")
     private String fechaInsercionBoletin;
     @Column(name = "boletin_oficial") // Doc en base 64
-    private String boletinOficial;
+    private byte[] boletinOficial;
 }
