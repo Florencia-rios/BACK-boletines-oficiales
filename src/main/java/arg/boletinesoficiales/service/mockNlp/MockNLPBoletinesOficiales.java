@@ -16,7 +16,8 @@ public class MockNLPBoletinesOficiales {
     private ResponseNLP mock_return_modelo_llm() {
 
         ResponseNLP responseNLP = new ResponseNLP();
-        Entities entities = new Entities();
+        List<Entities> entities = new ArrayList<>();
+        Entities entity = new Entities();
         List<Persona> personas = new ArrayList<>();
 
         Persona persona1 = new Persona();
@@ -90,7 +91,8 @@ public class MockNLPBoletinesOficiales {
         sociedad.setModificacion("No");
         sociedad.setPersonas(personas);
 
-        entities.setSociedad(sociedad);
+        entity.setSociedad(sociedad);
+        entities.add(entity);
 
         responseNLP.setEntities(entities);
 

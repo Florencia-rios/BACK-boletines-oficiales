@@ -1,5 +1,7 @@
 package arg.boletinesoficiales.service;
 
+import arg.boletinesoficiales.entity.core.EstadoCivil;
+import arg.boletinesoficiales.entity.core.Nacionalidades;
 import arg.boletinesoficiales.entity.core.Provincias;
 import arg.boletinesoficiales.entity.core.Sexo;
 import arg.boletinesoficiales.entity.user.Sociedad;
@@ -30,7 +32,7 @@ public class BoletinesOficialesService {
     @Autowired
     private EstadoCivilRepository estadoCivilRepository;
     @Autowired
-    private NacionalidadesRepository  nacionalidadesRepository;
+    private NacionalidadesRepository nacionalidadesRepository;
     @Autowired
     private CargosRepository cargosRepository;
 
@@ -92,13 +94,15 @@ public class BoletinesOficialesService {
             responseSociedad.setSexo(sexo);
 
             String prov = direccionSoc.getProvincia();
-            String provMayus = prov.isBlank() || prov.isEmpty()? "" : prov.toUpperCase();
-            if(!(prov.isBlank() || prov.isEmpty()) && provMayus.equals("CABA")){
+            String provMayus = prov.isBlank() || prov.isEmpty() ? "" : prov.toUpperCase();
+            if (!(prov.isBlank() || prov.isEmpty()) && provMayus.equals("CABA")) {
                 provMayus = "CAPITAL FEDERAL";
             }
             provMayus = this.validarProvincia(provMayus);
             Provincias provincia = provinciasRepository.find_by_name(provMayus);
             responseSociedad.setProvincia(provincia);
+
+
             // TODO faltan los demás campos: teléfono y código postal, fechaCargo, Cargo
 
             // -alta: 'Socio Solidario' SA siempre
@@ -117,7 +121,7 @@ public class BoletinesOficialesService {
             // PREGUNTAR * : UTE - UNION TRANSITORIA DE EMPRESAS
 
             responseFinal.add(responseSociedad);
-
+            validarRelacion(personas); // TODO para ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
             for (Persona persona : personas) {
                 contador++;
                 Sociedad responsePersona = new Sociedad();
@@ -143,30 +147,40 @@ public class BoletinesOficialesService {
                 responsePersona.setLocalidad(direccionPer.getLocalidad());
                 responsePersona.setBoletinOficial(boBinario);
                 responsePersona.setFechaInsercionBoletin(fechaInsercionBoletin);
-                // TODO faltan los demás campos: teléfono y código postal, fechaCargo. Tablas core
+                // TODO faltan los demás campos: teléfono y código postal, fechaCargo
 
                 String sex = persona.getSexo();
-                String sexMayus = sex.isBlank() || sex.isEmpty()? "" : sex.toUpperCase();
+                String sexMayus = sex.isBlank() || sex.isEmpty() ? "" : sex.toUpperCase();
                 Sexo sexoPersona = sexoRepository.find_by_name(sexMayus);
                 responseSociedad.setSexo(sexoPersona);
 
-                responsePersona.setRelacion(""); /// TODO tiene una logica, hay que ver de poner en forma consecutiva a las personas casadas
-
                 String provPersona = direccionSoc.getProvincia();
-                String provPersonaMayus = provPersona.isBlank() || provPersona.isEmpty()? "" : provPersona.toUpperCase();
-                if(!(provPersona.isBlank() || provPersona.isEmpty()) && provPersonaMayus.equals("CABA")){
+                String provPersonaMayus = provPersona.isBlank() || provPersona.isEmpty() ? "" : provPersona.toUpperCase();
+                if (!(provPersona.isBlank() || provPersona.isEmpty()) && provPersonaMayus.equals("CABA")) {
                     provPersonaMayus = "CAPITAL FEDERAL";
                 }
                 provPersonaMayus = this.validarProvincia(provPersonaMayus);
                 Provincias provinciaPersona = provinciasRepository.find_by_name(provPersonaMayus);
-                responseSociedad.setProvincia(provinciaPersona);
+                responsePersona.setProvincia(provinciaPersona);
+
+
+                String nac = persona.getNacionalidad();
+                String nacMayus = nac.isBlank() || nac.isEmpty() ? "" : nac.toUpperCase();
+                nacMayus = this.validarNacionalidad(nacMayus);
+                Nacionalidades nacionalidadPersona = nacionalidadesRepository.find_by_name(nacMayus);
+                responsePersona.setNacionalidad(nacionalidadPersona);
+
+                EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(persona.getEstadoCivil());
+                responsePersona.setEstadoCivil(estadoCivilPersona);
+
+                String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
+                responsePersona.setFuenteCargo(fuenteCargo);
+
 
                 // EN CASO DE BAJA SE LA PUEDE REEMPLAZAR X OTRA PERSONA, EL CARGO ES 'Socio Gerente' (default) o GERENTE si es srl, DESPUES ME VA A PASAR X TIPO SOC
                 // SA: PRESIDENTE, SH: SO, SOCIEDAD EN COMANDITA SC O SCA: SB (O SC * PREGUNTAR), SCS EN COMANDITA SIMPLE: SC (O SB * PREGUNTAR),
                 // sociedades con representacion en el pais pero no instalados: Representante Legal (* PREGUNTAR SOC)
-
-
-                // TODO en caso de baja podria ir Fallecido en cargo. NO PASAR A MAYUS NEC
+                // en caso de baja podria ir Fallecido en cargo. NO PASAR A MAYUS NEC
 
                 responseFinal.add(responsePersona);
             }
@@ -175,7 +189,7 @@ public class BoletinesOficialesService {
         return responseFinal;
     }
 
-    private String validarProvincia(String provIn){
+    private String validarProvincia(String provIn) {
         String[] provincias = {
                 "SALTA", "BUENOS AIRES", "CAPITAL FEDERAL", "SAN LUIS", "ENTRE RIOS",
                 "LA RIOJA", "SANTIAGO DEL ESTERO", "CHACO", "SAN JUAN", "CATAMARCA",
@@ -194,5 +208,27 @@ public class BoletinesOficialesService {
         }
 
         return provOut;
+    }
+
+    private String validarNacionalidad(String nacIn) {
+        String[] nacionalidades = {"ARGENTINA", "ALEMANIA", "AUSTRALIA", "BOLIVIA", "BRASIL", "COLOMBIA", "CUBA", "CANADA",
+                "CHECOSLOVAQUIA", "CHILE", "CHINA", "ESPAÑA", "ECUADOR", "FRANCIA", "GRAN BRETAÑA", "HOLANDA", "ITALIA",
+                "IRLANDA", "JAPON", "KOREA", "MEXICO", "EXTRANJERO", "PERU", "PORTUGAL", "PARAGUAY", "SUECIA", "SUIZA",
+                "TAIWAN", "URUGUAY", "ESTADOS UNIDOS", "EXTRANJERO", "YUGOSLAVIA"};
+
+        String nacOut = "";
+        for (String nacionalidad : nacionalidades) {
+            Pattern pattern = Pattern.compile("\\b" + nacionalidad + "\\b");
+            Matcher matcher = pattern.matcher(nacIn);
+            if (matcher.find()) {
+                nacOut = nacionalidad;
+            }
+        }
+
+        return nacOut;
+    }
+
+    private void validarRelacion(List<Persona> persona){
+
     }
 }

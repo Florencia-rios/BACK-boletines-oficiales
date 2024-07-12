@@ -71,11 +71,9 @@ public class Sociedad {
     private Provincias provincia;
     @Column(name="mor_cp")
     private String codigoPostal;
-
     @OneToOne
     @JoinColumn(name="mor_est_civil_id")
     private EstadoCivil estadoCivil;
-
     @OneToOne
     @JoinColumn(name="mor_nacionalidad_id")
     private Nacionalidades nacionalidad;
@@ -93,7 +91,6 @@ public class Sociedad {
     @Column(name="mor_cargo_fuente_id")
     @ColumnDefault(value = "BOL")
     private String fuenteCargo; // sólo si el integrante correspondiente se dió de baja en la sociedad, va BAJ
-
     @Column(name="mor_ant_codigo")
     @ColumnDefault(value = "XXX")
     private String antCodigo; // siempre es "XXX"
