@@ -35,4 +35,6 @@ public class Persona {
 
     @JsonProperty("casadoConIntegrante")
     private String casadoConIntegrante;
+
+    private String conyuge;
 }

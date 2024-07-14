@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,8 +119,9 @@ public class BoletinesOficialesService {
             // PREGUNTAR * : UTE - UNION TRANSITORIA DE EMPRESAS
 
             responseFinal.add(responseSociedad);
-            validarRelacion(personas); // TODO para ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
-            for (Persona persona : personas) {
+
+            List<Persona> personasOrdPorRel = validarRelacion(personas); // TODO para ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+            for (Persona persona : personasOrdPorRel) {
                 contador++;
                 Sociedad responsePersona = new Sociedad();
 
@@ -176,6 +175,10 @@ public class BoletinesOficialesService {
                 String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
                 responsePersona.setFuenteCargo(fuenteCargo);
 
+                if(persona.getConyuge().equals("C")){
+                    responsePersona.setRelacion("C");
+                }
+
 
                 // EN CASO DE BAJA SE LA PUEDE REEMPLAZAR X OTRA PERSONA, EL CARGO ES 'Socio Gerente' (default) o GERENTE si es srl, DESPUES ME VA A PASAR X TIPO SOC
                 // SA: PRESIDENTE, SH: SO, SOCIEDAD EN COMANDITA SC O SCA: SB (O SC * PREGUNTAR), SCS EN COMANDITA SIMPLE: SC (O SB * PREGUNTAR),
@@ -228,7 +231,33 @@ public class BoletinesOficialesService {
         return nacOut;
     }
 
-    private void validarRelacion(List<Persona> persona){
+    // Este metodo ordena a la lista de personas para que las personas casadas queden en secuencia
+    // dentro de las parejas, la que aparece segunda es la que llevará seteado C de conyuge
+    private List<Persona> validarRelacion(List<Persona> personas){
+        List<Persona> personasOrdPorRel = new ArrayList<>();
 
+        Map<String, String> relaciones = new HashMap<>();
+        Map<String, Persona> relacionesPersona = new HashMap<>();
+        for(Persona p: personas){
+            relaciones.put(p.getNombre(), p.getCasadoConIntegrante());
+            relacionesPersona.put(p.getNombre(), p);
+        }
+
+        for(Persona p: personas){
+            String nombreInteranteCasado = relaciones.get(p.getNombre());
+            if(!nombreInteranteCasado.isEmpty() || !nombreInteranteCasado.isBlank()){
+                personasOrdPorRel.add(p);
+                Persona integranteCasado = relacionesPersona.get(nombreInteranteCasado);
+                personasOrdPorRel.add(integranteCasado);
+
+                integranteCasado.setConyuge("C");
+
+                relaciones.remove(nombreInteranteCasado);
+                relacionesPersona.remove(nombreInteranteCasado);
+                personas.remove(integranteCasado);
+            }
+        }
+
+        return personasOrdPorRel;
     }
 }
