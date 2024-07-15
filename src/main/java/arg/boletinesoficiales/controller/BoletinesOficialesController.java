@@ -26,11 +26,11 @@ public class BoletinesOficialesController {
 
         List<Sociedad> sociedades = service.procesarBoletinOficial(request.getBoletinesOficiales());
 
-        response.setDataSociedades(
-                sociedades.stream()
-                        .map(s -> modelMapper.map(s, SociedadDto.class))
-                        .collect(Collectors.toList())
-        );
+        List<SociedadDto> sociedadDtos = sociedades.stream()
+                .map(s -> modelMapper.map(s, SociedadDto.class))
+                .collect(Collectors.toList());
+
+        response.setDataSociedades(sociedadDtos);
 
         return response;
     }

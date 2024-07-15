@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="cargos", schema = "[core]") // Nombre de la tabla y esquema
+@Table(name="cargos") // Nombre de la tabla y esquema
 @Getter
 @Setter
 public class Cargos {

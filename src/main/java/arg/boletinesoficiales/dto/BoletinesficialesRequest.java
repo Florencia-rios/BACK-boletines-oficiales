@@ -7,5 +7,6 @@ import java.util.List;
 @Data
 public class BoletinesficialesRequest {
 
-    private List<BoletinOficial> boletinesOficiales;
+    private String fechaBoletin;
+    private List<String> boletinesOficiales;
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="estado_civil", schema = "[core]")
+@Table(name="estado_civil")
 @Getter
 @Setter
 public class EstadoCivil {
