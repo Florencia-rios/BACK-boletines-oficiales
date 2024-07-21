@@ -18,6 +18,9 @@ public class Direccion {
     @JsonProperty("departamento")
     private String departamento;
 
+    @JsonProperty("codigoPostal")
+    private String codigoPostal;
+
     @JsonProperty("localidad")
     private String localidad;
 

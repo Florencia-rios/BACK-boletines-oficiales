@@ -18,6 +18,9 @@ public class Persona {
     @JsonProperty("fechaNacimiento")
     private String fechaNacimiento;
 
+    @JsonProperty("telefono")
+    private String telefono;
+
     @JsonProperty("nacionalidad")
     private String nacionalidad;
 
@@ -35,6 +38,9 @@ public class Persona {
 
     @JsonProperty("casadoConIntegrante")
     private String casadoConIntegrante;
+
+    @JsonProperty("fechaCargo")
+    private String fechaCargo;
 
     private String conyuge;
 }

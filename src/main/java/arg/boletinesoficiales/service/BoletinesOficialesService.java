@@ -68,11 +68,16 @@ public class BoletinesOficialesService {
             if (sociedad.getAlta().equals("Si")) {
                 responseSociedad.setUsuario("A");
                 responseSociedad.setSector("PC");
+                responseSociedad.setFechaCargo(fechaInsercionBoletin);
             } else if (sociedad.getAlta().equals("No") && (sociedad.getModificacion().equals("Si") || sociedad.getDisolucion().equals("Si"))) {
                 responseSociedad.setUsuario("M");
                 responseSociedad.setSector("MD");
                 if (sociedad.getDisolucion().equals("Si")) {
                     responseSociedad.setSociedadCategoria("DOC");
+                    String fechaCargoSociedad = sociedad.getFechaCargo();
+                    responseSociedad.setFechaCargo(!(fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank())? sociedad.getFechaCargo(): fechaInsercionBoletin);
+                } else {
+                    responseSociedad.setFechaCargo(fechaInsercionBoletin);
                 }
             }
             responseSociedad.setContador(contador);
@@ -100,8 +105,9 @@ public class BoletinesOficialesService {
             Provincias provincia = provinciasRepository.find_by_name(provMayus);
             responseSociedad.setProvincia(provincia);
 
+            responseFinal.add(responseSociedad);
 
-            // TODO faltan los demás campos: teléfono y código postal, fechaCargo, Cargo
+            // TODO faltan los demás campos: Cargo
 
             // -alta: 'Socio Solidario' SA siempre
             // -mod:
@@ -118,21 +124,22 @@ public class BoletinesOficialesService {
 
             // PREGUNTAR * : UTE - UNION TRANSITORIA DE EMPRESAS
 
-            responseFinal.add(responseSociedad);
 
-            List<Persona> personasOrdPorRel = validarRelacion(personas); // TODO para ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+            List<Persona> personasOrdPorRel = validarRelacion(personas); // para ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
             for (Persona persona : personasOrdPorRel) {
                 contador++;
                 Sociedad responsePersona = new Sociedad();
-
                 if (sociedad.getAlta().equals("Si")) {
                     responsePersona.setUsuario("A");
                     responsePersona.setSector("PC");
+                    responsePersona.setFechaCargo(fechaInsercionBoletin);
                 } else if (sociedad.getAlta().equals("No") && (sociedad.getModificacion().equals("Si") || sociedad.getDisolucion().equals("Si"))) {
                     responsePersona.setUsuario("M");
                     responsePersona.setSector("MD");
                     if (sociedad.getDisolucion().equals("Si")) {
                         responsePersona.setSociedadCategoria("DOC");
+                    } else {
+                        responsePersona.setFechaCargo(persona.getFechaCargo());
                     }
                 }
                 responsePersona.setContador(contador);
@@ -146,7 +153,7 @@ public class BoletinesOficialesService {
                 responsePersona.setLocalidad(direccionPer.getLocalidad());
                 responsePersona.setBoletinOficial(boBinario);
                 responsePersona.setFechaInsercionBoletin(fechaInsercionBoletin);
-                // TODO faltan los demás campos: teléfono y código postal, fechaCargo
+                // TODO faltan los demás campos: Cargo
 
                 String sex = persona.getSexo();
                 String sexMayus = sex.isBlank() || sex.isEmpty() ? "" : sex.toUpperCase();
