@@ -29,6 +29,9 @@ public class Sociedad {
     @JsonProperty("modificacion")
     private String modificacion;
 
+    @JsonProperty("fechaCargo")
+    private String fechaCargo;
+
     @JsonProperty("personas")
     private List<Persona> personas;
 }

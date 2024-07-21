@@ -88,7 +88,7 @@ public class Sociedad {
     @Column(name="mor_cargo_fecha")
     private String fechaCargo;  // (aaaammdd o dd/mm/aaaa)
 
-    @Column(name="mor_cargo_fuente_id")
+    @Column(name="mor_cargo_fuente")
     @ColumnDefault(value = "BOL")
     private String fuenteCargo; // sólo si el integrante correspondiente se dió de baja en la sociedad, va BAJ
     @Column(name="mor_ant_codigo")
