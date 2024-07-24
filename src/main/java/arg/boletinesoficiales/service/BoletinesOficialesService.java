@@ -4,7 +4,9 @@ import arg.boletinesoficiales.entity.core.*;
 import arg.boletinesoficiales.entity.user.Sociedad;
 import arg.boletinesoficiales.models.*;
 import arg.boletinesoficiales.repository.core.*;
+import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.mockNlp.MockNLPBoletinesOficiales;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +29,13 @@ public class BoletinesOficialesService {
     private NacionalidadesRepository nacionalidadesRepository;
     @Autowired
     private CargosRepository cargosRepository;
+    @Autowired
+    private SociedadRepository sociedadRepository;
 
     @Autowired
     private MockNLPBoletinesOficiales nlpBoletinesOficiales;
 
-    // TODO acá puedo usar un BoletinesOficialesResponse, en donde guarde, por cada boletin oficial, las entidades que guardo en la base de datos
+    @Transactional
     public List<Sociedad> procesarBoletinOficial(List<String> boletinesOficiales, String fechaBoletin) {
         List<Sociedad> responseTodosBoletines = new ArrayList<>();
 
@@ -43,7 +47,8 @@ public class BoletinesOficialesService {
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidades(boletinOficial);
             byte[] boBinario = Base64.getDecoder().decode(boletinOficial);
             List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
-            // todo recorrer las sociedades para ir insertandolas en la base
+
+            sociedadRepository.saveAllAndFlush(dataSociedades);
 
             responseTodosBoletines.addAll(dataSociedades);
         }
@@ -120,7 +125,7 @@ public class BoletinesOficialesService {
             responseSociedad.setProvincia(provincia);
 
             // CARGOS de sociedad:
-            if (sociedadNLP.getCausaModificacion().equals("denominacion anterior")) {
+            if (sociedadNLP.getModificacion().equals("Si") && sociedadNLP.getCausaModificacion().equals("denominacion anterior")) {
                 Cargos cargoSocNLP = cargosRepository.find_by_code("DA");
                 responseSociedad.setCargo(cargoSocNLP);
             } else if (sociedadNLP.getCausaModificacion().equals("absorbida")) {
