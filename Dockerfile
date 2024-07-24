@@ -1,15 +1,29 @@
-FROM openjdk:17-jdk-alpine as builder
+#FROM openjdk:17-jdk-alpine as builder
+#
+#WORKDIR /app
+#
+#COPY ./pom.xml .
+#COPY ./.mvn ./.mvn
+#COPY ./mvnw .
+#
+#RUN ./mvnw dependency:go-offline
+#COPY ./src ./src
+#
+##RUN ./mvnw clean package -DskipTests
+
+# Usar la imagen oficial de Maven para la fase de construcción
+FROM maven:3.8-openjdk-17 AS builder
 
 WORKDIR /app
 
-COPY ./pom.xml .
-COPY ./.mvn ./.mvn
-COPY ./mvnw .
+COPY pom.xml .
 
-RUN ./mvnw dependency:go-offline
-COPY ./src ./src
+RUN mvn dependency:go-offline
 
-RUN ./mvnw clean package -DskipTests
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
 
 FROM openjdk:17-jdk-alpine
 
