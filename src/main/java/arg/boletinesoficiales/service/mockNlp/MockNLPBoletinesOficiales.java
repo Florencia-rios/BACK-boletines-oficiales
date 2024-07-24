@@ -77,10 +77,10 @@ public class MockNLPBoletinesOficiales {
         personas.add(persona1);
         personas.add(persona2);
 
+        List<SociedadNLP> sociedades = new ArrayList<>();
         SociedadNLP sociedad = new SociedadNLP();
         String nombreSociedad = "1806 S.A";
         String fechaConstitucion = "19/10/2023";
-//        String cuit = "2740011366";
         Direccion direccionSociedad = new Direccion();
         sociedad.setNombre(nombreSociedad);
         sociedad.setCuit(null);
@@ -89,9 +89,11 @@ public class MockNLPBoletinesOficiales {
         sociedad.setAlta("Si");
         sociedad.setDisolucion("No");
         sociedad.setModificacion("No");
-        sociedad.setPersonas(personas);
+        sociedades.add(sociedad);
 
-        entity.setSociedadNLP(sociedad);
+
+        entity.setSociedadNLP(sociedades);
+        entity.setPersonas(personas);
         entities.add(entity);
 
         responseNLP.setEntities(entities);

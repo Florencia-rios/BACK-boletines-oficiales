@@ -9,5 +9,5 @@ import java.util.List;
 public class ResponseNLP {
 
     @JsonProperty("entidades")
-    private List<Entities> entities; // todo recordar que el nlp-boletines-oficiales, tiene que devolver este formato de respuesta
+    private List<Entities> entities;
 }

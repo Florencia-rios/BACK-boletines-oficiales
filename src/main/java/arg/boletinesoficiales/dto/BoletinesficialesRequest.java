@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class BoletinesficialesRequest {
 
-    private String fechaBoletin;
+    private String fechaBoletin; // me pasan la fecha de la publicacion del boletin oficial
     private List<String> boletinesOficiales;
 }

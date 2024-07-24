@@ -124,7 +124,7 @@ public class Sociedad {
     @ColumnDefault(value = "")
     private String sociedadCategoria; // Sólo es DOC si la sociedad se disolvió
     @Column(name = "fecha_insercion_boletin")
-    private String fechaInsercionBoletin;
+    private String fechaInsercionBoletin; // es la fecha actual, el dia en que pusieron a procesar cada boletin oficial
     @Column(name = "boletin_oficial") // Doc en base 64
     private byte[] boletinOficial;
 }

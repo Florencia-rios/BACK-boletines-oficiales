@@ -32,8 +32,8 @@ public class BoletinesOficialesService {
     private MockNLPBoletinesOficiales nlpBoletinesOficiales;
 
     // TODO acá puedo usar un BoletinesOficialesResponse, en donde guarde, por cada boletin oficial, las entidades que guardo en la base de datos
-    public List<Sociedad> procesarBoletinOficial(List<String> boletinesOficiales) {
-
+    public List<Sociedad> procesarBoletinOficial(List<String> boletinesOficiales, String fechaBoletin) {
+        List<Sociedad> responseTodosBoletines = new ArrayList<>();
 
         for (String boletinOficial : boletinesOficiales) {
             LocalDate fechaActual = LocalDate.now();
@@ -42,14 +42,16 @@ public class BoletinesOficialesService {
 
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidades(boletinOficial);
             byte[] boBinario = Base64.getDecoder().decode(boletinOficial);
-            List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin);
-            // todo tengo que hacer un método que vaya recorriendo las sociedades y las vaya insertando en la tabla Sociedad
+            List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
+            // todo recorrer las sociedades para ir insertandolas en la base
+
+            responseTodosBoletines.addAll(dataSociedades);
         }
 
-        return null; // TODO qué devuelvo?????
+        return responseTodosBoletines;
     }
 
-    private List<Sociedad> obetenerDataFinal(ResponseNLP responseNLP, byte[] boBinario, String fechaInsercionBoletin) {
+    private List<Sociedad> obetenerDataFinal(ResponseNLP responseNLP, byte[] boBinario, String fechaInsercionBoletin, String fechaBoletin) {
         // Va a tener toda la informacion de los registros correspondiente a una sociedad principal, es decir la sociedad principal,
         // una o mas sociedades secundarias, y las personas o integrantes de la sociedad principal
         List<Sociedad> responseFinal = new ArrayList<>();
@@ -60,27 +62,27 @@ public class BoletinesOficialesService {
             int contador = 0;
 
             List<SociedadNLP> sociedades = entitiesPorSociedad.getSociedadNLP();
-            contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, sociedades, contador, responseFinal);
+            contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
             List<Persona> personas = entitiesPorSociedad.getPersonas();
             List<Persona> personasOrdPorRel = validarRelacion(personas); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
             SociedadNLP sociedadNLP = sociedades.get(0);
             if (!sociedadNLP.getDisolucion().equals("Si")) {
-                obtenerDataPersonas(boBinario, fechaInsercionBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+                obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
             }
         }
 
         return responseFinal;
     }
 
-    private int obtenerDataSociedades(byte[] boBinario, String fechaInsercionBoletin, List<SociedadNLP> sociedades, int contador, List<Sociedad> responseFinal) {
+    private int obtenerDataSociedades(byte[] boBinario, String fechaInsercionBoletin, String fechaBoletin, List<SociedadNLP> sociedades, int contador, List<Sociedad> responseFinal) {
         for (SociedadNLP sociedadNLP : sociedades) {
             Sociedad responseSociedad = new Sociedad();
 
             if (sociedadNLP.getAlta().equals("Si")) {
                 responseSociedad.setUsuario("A");
                 responseSociedad.setSector("PC");
-                responseSociedad.setFechaCargo(fechaInsercionBoletin);
+                responseSociedad.setFechaCargo(fechaBoletin);
             } else if (sociedadNLP.getAlta().equals("No") && (sociedadNLP.getModificacion().equals("Si") || sociedadNLP.getDisolucion().equals("Si"))) {
                 responseSociedad.setUsuario("M");
                 responseSociedad.setSector("MD");
@@ -89,7 +91,7 @@ public class BoletinesOficialesService {
                     String fechaCargoSociedad = sociedadNLP.getFechaCargo();
                     responseSociedad.setFechaCargo(!(fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank()) ? sociedadNLP.getFechaCargo() : fechaInsercionBoletin);
                 } else {
-                    responseSociedad.setFechaCargo(fechaInsercionBoletin);
+                    responseSociedad.setFechaCargo(fechaBoletin);
                 }
             }
             responseSociedad.setContador(contador);
@@ -137,7 +139,7 @@ public class BoletinesOficialesService {
         return contador;
     }
 
-    private void obtenerDataPersonas(byte[] boBinario, String fechaInsercionBoletin, List<Persona> personasOrdPorRel, SociedadNLP sociedadNLP, int contador, List<Sociedad> responseFinal) {
+    private void obtenerDataPersonas(byte[] boBinario, String fechaInsercionBoletin, String fechaBoletin, List<Persona> personasOrdPorRel, SociedadNLP sociedadNLP, int contador, List<Sociedad> responseFinal) {
         for (Persona persona : personasOrdPorRel) {
 
             String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
@@ -164,7 +166,7 @@ public class BoletinesOficialesService {
                 if (sociedadNLP.getAlta().equals("Si")) {
                     responsePersona.setUsuario("A");
                     responsePersona.setSector("PC");
-                    responsePersona.setFechaCargo(fechaInsercionBoletin);
+                    responsePersona.setFechaCargo(fechaBoletin);
                 } else if (sociedadNLP.getAlta().equals("No") && (sociedadNLP.getModificacion().equals("Si") || sociedadNLP.getDisolucion().equals("Si"))) {
                     responsePersona.setUsuario("M");
                     responsePersona.setSector("MD");
