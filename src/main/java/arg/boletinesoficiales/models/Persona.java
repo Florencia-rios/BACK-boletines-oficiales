@@ -21,8 +21,8 @@ public class Persona {
     @JsonProperty("telefono")
     private String telefono;
 
-    @JsonProperty("nacionalidad")
-    private String nacionalidad;
+    @JsonProperty("pais")
+    private String pais;
 
     @JsonProperty("estadoCivil")
     private String estadoCivil;

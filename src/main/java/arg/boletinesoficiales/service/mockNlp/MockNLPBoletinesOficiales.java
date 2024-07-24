@@ -50,7 +50,7 @@ public class MockNLPBoletinesOficiales {
         persona1.setSexo(sexo1);
         persona1.setDocumento(documento1);
         persona1.setFechaNacimiento(fechaNacimiento1);
-        persona1.setNacionalidad(nacionalidad1);
+        persona1.setPais(nacionalidad1);
         persona1.setEstadoCivil(estadoCivil1);
         persona1.setCargo(cargo1);
         persona1.setDireccion(direccionPersona1);
@@ -67,7 +67,7 @@ public class MockNLPBoletinesOficiales {
         persona2.setSexo(sexo2);
         persona2.setDocumento(documento2);
         persona2.setFechaNacimiento(fechaNacimiento2);
-        persona2.setNacionalidad(nacionalidad2);
+        persona2.setPais(nacionalidad2);
         persona2.setEstadoCivil(estadoCivil2);
         persona2.setCargo(cargo2);
         persona2.setDireccion(direccionPersona2);
