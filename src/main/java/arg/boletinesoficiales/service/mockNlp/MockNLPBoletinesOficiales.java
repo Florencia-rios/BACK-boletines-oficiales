@@ -77,7 +77,7 @@ public class MockNLPBoletinesOficiales {
         personas.add(persona1);
         personas.add(persona2);
 
-        Sociedad sociedad = new Sociedad();
+        SociedadNLP sociedad = new SociedadNLP();
         String nombreSociedad = "1806 S.A";
         String fechaConstitucion = "19/10/2023";
 //        String cuit = "2740011366";
@@ -91,7 +91,7 @@ public class MockNLPBoletinesOficiales {
         sociedad.setModificacion("No");
         sociedad.setPersonas(personas);
 
-        entity.setSociedad(sociedad);
+        entity.setSociedadNLP(sociedad);
         entities.add(entity);
 
         responseNLP.setEntities(entities);

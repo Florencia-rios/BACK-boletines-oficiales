@@ -77,17 +77,13 @@ public class Sociedad {
     @OneToOne
     @JoinColumn(name="mor_nacionalidad_id")
     private Nacionalidades nacionalidad;
-
     @Column(name="mor_relacion")
     private String relacion; // si esta casado con el integrante anterior, va C
-
     @OneToOne
     @JoinColumn(name="mor_cargo_id")
     private Cargos cargo;
-
     @Column(name="mor_cargo_fecha")
     private String fechaCargo;  // (aaaammdd o dd/mm/aaaa)
-
     @Column(name="mor_cargo_fuente")
     @ColumnDefault(value = "BOL")
     private String fuenteCargo; // sólo si el integrante correspondiente se dió de baja en la sociedad, va BAJ

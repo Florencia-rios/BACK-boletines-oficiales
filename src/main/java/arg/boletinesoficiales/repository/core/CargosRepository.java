@@ -8,4 +8,7 @@ public interface CargosRepository extends JpaRepository<Cargos, Integer> {
 
     @Query("SELECT c FROM Cargos c WHERE c.nombre = :name")
     Cargos find_by_name(String name);
+
+    @Query("SELECT c FROM Cargos c WHERE c.codigo = :code")
+    Cargos find_by_code(String code);
 }

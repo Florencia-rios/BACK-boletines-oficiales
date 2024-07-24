@@ -1,14 +1,8 @@
 package arg.boletinesoficiales.service;
 
-import arg.boletinesoficiales.entity.core.EstadoCivil;
-import arg.boletinesoficiales.entity.core.Nacionalidades;
-import arg.boletinesoficiales.entity.core.Provincias;
-import arg.boletinesoficiales.entity.core.Sexo;
+import arg.boletinesoficiales.entity.core.*;
 import arg.boletinesoficiales.entity.user.Sociedad;
-import arg.boletinesoficiales.models.Direccion;
-import arg.boletinesoficiales.models.Entities;
-import arg.boletinesoficiales.models.Persona;
-import arg.boletinesoficiales.models.ResponseNLP;
+import arg.boletinesoficiales.models.*;
 import arg.boletinesoficiales.repository.core.*;
 import arg.boletinesoficiales.service.mockNlp.MockNLPBoletinesOficiales;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,42 +43,60 @@ public class BoletinesOficialesService {
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidades(boletinOficial);
             byte[] boBinario = Base64.getDecoder().decode(boletinOficial);
             List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin);
-
+            // todo tengo que hacer un método que vaya recorriendo las sociedades y las vaya insertando en la tabla Sociedad
         }
 
-        return null;
+        return null; // TODO qué devuelvo?????
     }
 
     private List<Sociedad> obetenerDataFinal(ResponseNLP responseNLP, byte[] boBinario, String fechaInsercionBoletin) {
+        // Va a tener toda la informacion de los registros correspondiente a una sociedad principal, es decir la sociedad principal,
+        // una o mas sociedades secundarias, y las personas o integrantes de la sociedad principal
         List<Sociedad> responseFinal = new ArrayList<>();
 
-        List<Entities> sociedades = responseNLP.getEntities();
-        for (int i = 0; i < sociedades.size(); i++) {
-            arg.boletinesoficiales.models.Sociedad sociedad = sociedades.get(i).getSociedad();
-            List<Persona> personas = sociedad.getPersonas();
+        List<Entities> entities = responseNLP.getEntities(); // lista de entities es porque cada objeto ENTITIES es una SOCIEDAD del boletin oficial que estoy procesando
 
+        for (Entities entitiesPorSociedad : entities) {
             int contador = 0;
+
+            List<SociedadNLP> sociedades = entitiesPorSociedad.getSociedadNLP();
+            contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, sociedades, contador, responseFinal);
+
+            List<Persona> personas = entitiesPorSociedad.getPersonas();
+            List<Persona> personasOrdPorRel = validarRelacion(personas); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+            SociedadNLP sociedadNLP = sociedades.get(0);
+            if (!sociedadNLP.getDisolucion().equals("Si")) {
+                obtenerDataPersonas(boBinario, fechaInsercionBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+            }
+        }
+
+        return responseFinal;
+    }
+
+    private int obtenerDataSociedades(byte[] boBinario, String fechaInsercionBoletin, List<SociedadNLP> sociedades, int contador, List<Sociedad> responseFinal) {
+        for (SociedadNLP sociedadNLP : sociedades) {
             Sociedad responseSociedad = new Sociedad();
-            if (sociedad.getAlta().equals("Si")) {
+
+            if (sociedadNLP.getAlta().equals("Si")) {
                 responseSociedad.setUsuario("A");
                 responseSociedad.setSector("PC");
                 responseSociedad.setFechaCargo(fechaInsercionBoletin);
-            } else if (sociedad.getAlta().equals("No") && (sociedad.getModificacion().equals("Si") || sociedad.getDisolucion().equals("Si"))) {
+            } else if (sociedadNLP.getAlta().equals("No") && (sociedadNLP.getModificacion().equals("Si") || sociedadNLP.getDisolucion().equals("Si"))) {
                 responseSociedad.setUsuario("M");
                 responseSociedad.setSector("MD");
-                if (sociedad.getDisolucion().equals("Si")) {
+                if (sociedadNLP.getDisolucion().equals("Si")) {
                     responseSociedad.setSociedadCategoria("DOC");
-                    String fechaCargoSociedad = sociedad.getFechaCargo();
-                    responseSociedad.setFechaCargo(!(fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank())? sociedad.getFechaCargo(): fechaInsercionBoletin);
+                    String fechaCargoSociedad = sociedadNLP.getFechaCargo();
+                    responseSociedad.setFechaCargo(!(fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank()) ? sociedadNLP.getFechaCargo() : fechaInsercionBoletin);
                 } else {
                     responseSociedad.setFechaCargo(fechaInsercionBoletin);
                 }
             }
             responseSociedad.setContador(contador);
-            responseSociedad.setNombreCompleto(sociedad.getNombre());
-            responseSociedad.setFechaNacimiento(sociedad.getFechaConstitucion());
-            responseSociedad.setDocumento(sociedad.getCuit());
-            Direccion direccionSoc = sociedad.getDireccion();
+            responseSociedad.setNombreCompleto(sociedadNLP.getNombre());
+            responseSociedad.setFechaNacimiento(sociedadNLP.getFechaConstitucion());
+            responseSociedad.setDocumento(sociedadNLP.getCuit());
+            Direccion direccionSoc = sociedadNLP.getDireccion();
             responseSociedad.setCalle(direccionSoc.getCalle());
             responseSociedad.setAltura(direccionSoc.getAltura());
             responseSociedad.setPisoDepto(direccionSoc.getPiso() + " " + direccionSoc.getDepartamento());
@@ -105,62 +117,77 @@ public class BoletinesOficialesService {
             Provincias provincia = provinciasRepository.find_by_name(provMayus);
             responseSociedad.setProvincia(provincia);
 
+            // CARGOS de sociedad:
+            if (sociedadNLP.getCausaModificacion().equals("denominacion anterior")) {
+                Cargos cargoSocNLP = cargosRepository.find_by_code("DA");
+                responseSociedad.setCargo(cargoSocNLP);
+            } else if (sociedadNLP.getCausaModificacion().equals("absorbida")) {
+                Cargos cargoSocNLP = cargosRepository.find_by_code("AB");
+                responseSociedad.setCargo(cargoSocNLP);
+            } else {
+                Cargos cargoSocNLP = cargosRepository.find_by_code("SA");
+                responseSociedad.setCargo(cargoSocNLP);
+            }
+            //////
+
             responseFinal.add(responseSociedad);
 
-            // TODO faltan los demás campos: Cargo
+            contador++;
+        }
+        return contador;
+    }
 
-            // -alta: 'Socio Solidario' SA siempre
-            // -mod:
-            // Si se cambia el tipo societario: mod, el cargo es: DENOMINACION ANTERIOR, pasa a llamarse: bla=
-            // como 0 en el contador va: <nuevo_nombre nuevo_tipo_soc> cargo: SA
-            // como 1 en el contador va: <viejo_nombre viejo tipo_soc> cargo: DA
+    private void obtenerDataPersonas(byte[] boBinario, String fechaInsercionBoletin, List<Persona> personasOrdPorRel, SociedadNLP sociedadNLP, int contador, List<Sociedad> responseFinal) {
+        for (Persona persona : personasOrdPorRel) {
 
-            // CARFO: ABSORBIDA, ES UNA MODIFICACION: UNA SOC ABS A OTRA
-            // REGUNTAR * SI SIGUE EL PATRON DE CAMNIO DE TIPO SOC
+            String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
 
-            // -dic:
-            // para una disolucion FUSION o SA?? * PREGUNTAR
-            // REGUNTAR * SI SIGUE EL PATRON DE CAMNIO DE TIPO SOC
+            String cargoPersonaMayus = persona.getCargo().isBlank() || persona.getCargo().isEmpty() ? "" : persona.getCargo().toUpperCase();
+            String cargoOut = validarCargo(cargoPersonaMayus);
+            if (cargoOut.isEmpty() && fuenteCargo.equals("BAJ")) {
+                // TODO poner logica de baja sin cargo en el documento y sobre escribir la variable cargoOut
+                //  primero obtener el tipo societario (vienen con puntos)
+                //  en base a eso, setear el cargoOut en base a lo que existe en el maestro
 
-            // PREGUNTAR * : UTE - UNION TRANSITORIA DE EMPRESAS
+                String[] tiposSocietarios = {"SRL", "SA", "SH", "SCA", "SCS", "UTE", "SAS", "SAU"};
 
+            }
 
-            List<Persona> personasOrdPorRel = validarRelacion(personas); // para ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
-            for (Persona persona : personasOrdPorRel) {
-                contador++;
+            if (!cargoOut.isEmpty()) {
                 Sociedad responsePersona = new Sociedad();
-                if (sociedad.getAlta().equals("Si")) {
+
+                Cargos cargoPersona = cargosRepository.find_by_name(cargoOut);
+                responsePersona.setCargo(cargoPersona);
+
+                responsePersona.setFuenteCargo(fuenteCargo);
+
+                if (sociedadNLP.getAlta().equals("Si")) {
                     responsePersona.setUsuario("A");
                     responsePersona.setSector("PC");
                     responsePersona.setFechaCargo(fechaInsercionBoletin);
-                } else if (sociedad.getAlta().equals("No") && (sociedad.getModificacion().equals("Si") || sociedad.getDisolucion().equals("Si"))) {
+                } else if (sociedadNLP.getAlta().equals("No") && (sociedadNLP.getModificacion().equals("Si") || sociedadNLP.getDisolucion().equals("Si"))) {
                     responsePersona.setUsuario("M");
                     responsePersona.setSector("MD");
-                    if (sociedad.getDisolucion().equals("Si")) {
-                        responsePersona.setSociedadCategoria("DOC");
-                    } else {
-                        responsePersona.setFechaCargo(persona.getFechaCargo());
-                    }
+                    responsePersona.setFechaCargo(persona.getFechaCargo());
                 }
                 responsePersona.setContador(contador);
                 responsePersona.setNombreCompleto(persona.getNombre());
                 responsePersona.setFechaNacimiento(persona.getFechaNacimiento());
                 responsePersona.setDocumento(persona.getDocumento());
-                Direccion direccionPer = sociedad.getDireccion();
+                Direccion direccionPer = persona.getDireccion();
                 responsePersona.setCalle(direccionPer.getCalle());
                 responsePersona.setAltura(direccionPer.getAltura());
                 responsePersona.setPisoDepto(direccionPer.getPiso() + " " + direccionPer.getDepartamento());
                 responsePersona.setLocalidad(direccionPer.getLocalidad());
                 responsePersona.setBoletinOficial(boBinario);
                 responsePersona.setFechaInsercionBoletin(fechaInsercionBoletin);
-                // TODO faltan los demás campos: Cargo
 
                 String sex = persona.getSexo();
                 String sexMayus = sex.isBlank() || sex.isEmpty() ? "" : sex.toUpperCase();
                 Sexo sexoPersona = sexoRepository.find_by_name(sexMayus);
-                responseSociedad.setSexo(sexoPersona);
+                responsePersona.setSexo(sexoPersona);
 
-                String provPersona = direccionSoc.getProvincia();
+                String provPersona = direccionPer.getProvincia();
                 String provPersonaMayus = provPersona.isBlank() || provPersona.isEmpty() ? "" : provPersona.toUpperCase();
                 if (!(provPersona.isBlank() || provPersona.isEmpty()) && provPersonaMayus.equals("CABA")) {
                     provPersonaMayus = "CAPITAL FEDERAL";
@@ -168,7 +195,6 @@ public class BoletinesOficialesService {
                 provPersonaMayus = this.validarProvincia(provPersonaMayus);
                 Provincias provinciaPersona = provinciasRepository.find_by_name(provPersonaMayus);
                 responsePersona.setProvincia(provinciaPersona);
-
 
                 String nac = persona.getNacionalidad();
                 String nacMayus = nac.isBlank() || nac.isEmpty() ? "" : nac.toUpperCase();
@@ -179,24 +205,37 @@ public class BoletinesOficialesService {
                 EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(persona.getEstadoCivil());
                 responsePersona.setEstadoCivil(estadoCivilPersona);
 
-                String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
-                responsePersona.setFuenteCargo(fuenteCargo);
-
-                if(persona.getConyuge().equals("C")){
+                if (persona.getConyuge().equals("C")) {
                     responsePersona.setRelacion("C");
                 }
 
-
-                // EN CASO DE BAJA SE LA PUEDE REEMPLAZAR X OTRA PERSONA, EL CARGO ES 'Socio Gerente' (default) o GERENTE si es srl, DESPUES ME VA A PASAR X TIPO SOC
-                // SA: PRESIDENTE, SH: SO, SOCIEDAD EN COMANDITA SC O SCA: SB (O SC * PREGUNTAR), SCS EN COMANDITA SIMPLE: SC (O SB * PREGUNTAR),
-                // sociedades con representacion en el pais pero no instalados: Representante Legal (* PREGUNTAR SOC)
-                // en caso de baja podria ir Fallecido en cargo. NO PASAR A MAYUS NEC
-
                 responseFinal.add(responsePersona);
+
+                contador++;
+            }
+        }
+    }
+
+    private String validarCargo(String cargoIn) {
+        String[] cargos = {
+                "ABSORBIDA", "GERENTE", "Director Titular", "Presidente",
+                "Representante Legal", "Socio Solidario", "Socio Comanditado",
+                "Socio Comanditario", "Socio Gerente", "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA",
+                "DENOMINACION ANTERIOR", "ESCINDIDA", "Vicepresidente", "Vicepresidente Primero", "Vicepresidente Segundo",
+                "Vicepresidente Tercero", "Vicepresidente Cuarto", "FUSION", "UTE"
+        };
+
+        String cargoOut = "";
+        for (String cargo : cargos) {
+            String cargoMayus = cargo.toUpperCase();
+            Pattern pattern = Pattern.compile("\\b" + cargoMayus + "\\b");
+            Matcher matcher = pattern.matcher(cargoIn);
+            if (matcher.find()) {
+                cargoOut = cargo;
             }
         }
 
-        return responseFinal;
+        return cargoOut;
     }
 
     private String validarProvincia(String provIn) {
@@ -240,19 +279,19 @@ public class BoletinesOficialesService {
 
     // Este metodo ordena a la lista de personas para que las personas casadas queden en secuencia
     // dentro de las parejas, la que aparece segunda es la que llevará seteado C de conyuge
-    private List<Persona> validarRelacion(List<Persona> personas){
+    private List<Persona> validarRelacion(List<Persona> personas) {
         List<Persona> personasOrdPorRel = new ArrayList<>();
 
         Map<String, String> relaciones = new HashMap<>();
         Map<String, Persona> relacionesPersona = new HashMap<>();
-        for(Persona p: personas){
+        for (Persona p : personas) {
             relaciones.put(p.getNombre(), p.getCasadoConIntegrante());
             relacionesPersona.put(p.getNombre(), p);
         }
 
-        for(Persona p: personas){
+        for (Persona p : personas) {
             String nombreInteranteCasado = relaciones.get(p.getNombre());
-            if(!nombreInteranteCasado.isEmpty() || !nombreInteranteCasado.isBlank()){
+            if (!nombreInteranteCasado.isEmpty() || !nombreInteranteCasado.isBlank()) {
                 personasOrdPorRel.add(p);
                 Persona integranteCasado = relacionesPersona.get(nombreInteranteCasado);
                 personasOrdPorRel.add(integranteCasado);
