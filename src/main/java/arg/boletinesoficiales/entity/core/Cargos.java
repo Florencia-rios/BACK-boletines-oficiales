@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="CARGOS") // Nombre de la tabla y esquema
+@Table(name="CARGOS")
 @Getter
 @Setter
 public class Cargos {

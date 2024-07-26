@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SexoRepository  extends JpaRepository<Sexo, Integer> {
 
-    @Query("SELECT c FROM Sexo c WHERE c.nombre = :nombre")
-    Sexo findByNombre(@Param("nombre") String nombre);
-
+    @Query("SELECT c FROM Sexo c WHERE c.nombre = :name")
+    Sexo find_by_name(@Param("name") String name);
 }

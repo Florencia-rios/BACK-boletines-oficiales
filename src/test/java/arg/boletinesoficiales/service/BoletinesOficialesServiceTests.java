@@ -2,6 +2,8 @@ package arg.boletinesoficiales.service;
 
 import arg.boletinesoficiales.entity.user.Sociedad;
 import arg.boletinesoficiales.models.ResponseNLP;
+import arg.boletinesoficiales.repository.core.EstadoCivilRepository;
+import arg.boletinesoficiales.repository.core.ProvinciasRepository;
 import arg.boletinesoficiales.repository.core.SexoRepository;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.nlp.NLPBoletinesOficiales;
@@ -34,10 +36,19 @@ public class BoletinesOficialesServiceTests {
     @Autowired
     private SexoRepository sexoRepository;
     @Autowired
+    private ProvinciasRepository provinciasRepository;
+    @Autowired
     private SociedadRepository sociedadRepository;
+    @Autowired
+    private EstadoCivilRepository estadoCivilRepository;
 
     @MockBean
     private NLPBoletinesOficiales nlpBoletinesOficiales;
+
+    @Test
+    void xx(){
+        estadoCivilRepository.findAll();
+    }
 
     @Test
     void altaSociedad() {

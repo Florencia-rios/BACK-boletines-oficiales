@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="sociedad")
+@Table(name="SOCIEDAD")
 @Getter
 public class Sociedad {
     private static final long serialVersionUID = 1L;

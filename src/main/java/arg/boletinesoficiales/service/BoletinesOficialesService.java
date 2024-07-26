@@ -124,7 +124,7 @@ public class BoletinesOficialesService {
             responseSociedad.setBoletinOficial(boBinario);
             responseSociedad.setFechaInsercionBoletin(fechaInsercionBoletin);
 
-            Sexo sexo = sexoRepository.findByNombre("SOCIEDAD");
+            Sexo sexo = sexoRepository.find_by_name("SOCIEDAD");
             responseSociedad.setSexo(sexo);
 
             String prov = direccionSoc.getProvincia();
@@ -216,7 +216,7 @@ public class BoletinesOficialesService {
                 String sex = persona.getSexo();
                 String sexMayus = sex == null || sex.isBlank() || sex.isEmpty()? "NO APORTADO" : sex.toUpperCase();
                 String sexValidado = validarSexo(sexMayus);
-                Sexo sexoPersona = sexoRepository.findByNombre(sexValidado);
+                Sexo sexoPersona = sexoRepository.find_by_name(sexValidado);
                 responsePersona.setSexo(sexoPersona);
 
                 String provPersona = direccionPer.getProvincia();
