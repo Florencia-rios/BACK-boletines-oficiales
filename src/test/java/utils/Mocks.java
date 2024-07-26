@@ -1,12 +1,10 @@
 package utils;
 
 import arg.boletinesoficiales.models.*;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 public class Mocks {
 
     public ResponseNLP altaSociedad(){

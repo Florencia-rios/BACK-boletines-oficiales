@@ -50,7 +50,7 @@ public class BoletinesOficialesService {
             byte[] boBinario = Base64.getDecoder().decode(boletinOficial);
             List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
 
-            sociedadRepository.saveAllAndFlush(dataSociedades);
+            sociedadRepository.saveAll(dataSociedades);
 
             responseTodosBoletines.addAll(dataSociedades);
         }
@@ -113,18 +113,23 @@ public class BoletinesOficialesService {
             Direccion direccionSoc = sociedadNLP.getDireccion();
             responseSociedad.setCalle(direccionSoc.getCalle());
             responseSociedad.setAltura(direccionSoc.getAltura());
-            responseSociedad.setPisoDepto(direccionSoc.getPiso() + " " + direccionSoc.getDepartamento());
+
+            String piso = direccionSoc.getPiso() == null? "": direccionSoc.getPiso();
+            String depto = direccionSoc.getDepartamento() == null? "": direccionSoc.getDepartamento();
+            String pisoDepto = piso + " " + depto;
+            responseSociedad.setPisoDepto(pisoDepto.strip());
             responseSociedad.setLocalidad(direccionSoc.getLocalidad());
+            responseSociedad.setCodigoPostal(direccionSoc.getCodigoPostal());
             responseSociedad.setRelacion("");
             responseSociedad.setBoletinOficial(boBinario);
             responseSociedad.setFechaInsercionBoletin(fechaInsercionBoletin);
 
-            Sexo sexo = sexoRepository.find_by_name("SOCIEDAD");
+            Sexo sexo = sexoRepository.findByNombre("SOCIEDAD");
             responseSociedad.setSexo(sexo);
 
             String prov = direccionSoc.getProvincia();
-            String provMayus = prov.isBlank() || prov.isEmpty() ? "" : prov.toUpperCase();
-            if (!(prov.isBlank() || prov.isEmpty()) && provMayus.equals("CABA")) {
+            String provMayus = prov == null ? "" : prov.toUpperCase();
+            if (provMayus.equals("CABA")) {
                 provMayus = "CAPITAL FEDERAL";
             }
             provMayus = this.validarProvincia(provMayus);
@@ -132,10 +137,10 @@ public class BoletinesOficialesService {
             responseSociedad.setProvincia(provincia);
 
             // CARGOS de sociedad:
-            if (sociedadNLP.getModificacion().equals("Si") && sociedadNLP.getCausaModificacion().equals("denominacion anterior")) {
+            if (sociedadNLP.getCausaModificacion() != null && sociedadNLP.getModificacion().equals("Si") && sociedadNLP.getCausaModificacion().equals("denominacion anterior")) {
                 Cargos cargoSocNLP = cargosRepository.find_by_code("DA");
                 responseSociedad.setCargo(cargoSocNLP);
-            } else if (sociedadNLP.getCausaModificacion().equals("absorbida")) {
+            } else if (sociedadNLP.getCausaModificacion() != null && sociedadNLP.getCausaModificacion().equals("absorbida")) {
                 Cargos cargoSocNLP = cargosRepository.find_by_code("AB");
                 responseSociedad.setCargo(cargoSocNLP);
             } else {
@@ -156,7 +161,7 @@ public class BoletinesOficialesService {
 
             String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
 
-            String cargoPersonaMayus = persona.getCargo().isBlank() || persona.getCargo().isEmpty() ? "" : persona.getCargo().toUpperCase();
+            String cargoPersonaMayus = persona.getCargo() == null  ? "" : persona.getCargo().toUpperCase();
             String cargoOut = validarCargo(cargoPersonaMayus);
             if (cargoOut.isEmpty() && fuenteCargo.equals("BAJ")) {
                 // TODO poner logica de baja sin cargo en el documento y sobre escribir la variable cargoOut
@@ -170,7 +175,7 @@ public class BoletinesOficialesService {
             if (!cargoOut.isEmpty()) {
                 Sociedad responsePersona = new Sociedad();
 
-                Cargos cargoPersona = cargosRepository.find_by_name(cargoOut);
+                Cargos cargoPersona = cargosRepository.findByName(cargoOut);
                 responsePersona.setCargo(cargoPersona);
 
                 responsePersona.setFuenteCargo(fuenteCargo);
@@ -194,23 +199,29 @@ public class BoletinesOficialesService {
                 String fechaNacimiento = fechaValida? persona.getFechaNacimiento(): "";
                 responsePersona.setFechaNacimiento(fechaNacimiento);
                 responsePersona.setDocumento(persona.getDocumento());
+                responsePersona.setTelefono(persona.getTelefono());
                 Direccion direccionPer = persona.getDireccion();
                 responsePersona.setCalle(direccionPer.getCalle());
                 responsePersona.setAltura(direccionPer.getAltura());
-                responsePersona.setPisoDepto(direccionPer.getPiso() + " " + direccionPer.getDepartamento());
+
+                String piso = direccionPer.getPiso() == null? "": direccionPer.getPiso();
+                String depto = direccionPer.getDepartamento() == null? "": direccionPer.getDepartamento();
+                String pisoDepto = piso + " " + depto;
+                responsePersona.setPisoDepto(pisoDepto.strip());
                 responsePersona.setLocalidad(direccionPer.getLocalidad());
+                responsePersona.setCodigoPostal(direccionPer.getCodigoPostal());
                 responsePersona.setBoletinOficial(boBinario);
                 responsePersona.setFechaInsercionBoletin(fechaInsercionBoletin);
 
                 String sex = persona.getSexo();
-                String sexMayus = sex.isBlank() || sex.isEmpty() ? "NO APORTADO" : sex.toUpperCase();
+                String sexMayus = sex == null || sex.isBlank() || sex.isEmpty()? "NO APORTADO" : sex.toUpperCase();
                 String sexValidado = validarSexo(sexMayus);
-                Sexo sexoPersona = sexoRepository.find_by_name(sexValidado);
+                Sexo sexoPersona = sexoRepository.findByNombre(sexValidado);
                 responsePersona.setSexo(sexoPersona);
 
                 String provPersona = direccionPer.getProvincia();
-                String provPersonaMayus = provPersona.isBlank() || provPersona.isEmpty() ? "" : provPersona.toUpperCase();
-                if (!(provPersona.isBlank() || provPersona.isEmpty()) && provPersonaMayus.equals("CABA")) {
+                String provPersonaMayus = provPersona == null ? "" : provPersona.toUpperCase();
+                if (provPersonaMayus.equals("CIUDAD DE BUENOS AIRES") || provPersonaMayus.equals("CABA")) {
                     provPersonaMayus = "CAPITAL FEDERAL";
                 }
                 provPersonaMayus = this.validarProvincia(provPersonaMayus);
@@ -218,12 +229,12 @@ public class BoletinesOficialesService {
                 responsePersona.setProvincia(provinciaPersona);
 
                 String nac = persona.getPais();
-                String nacMayus = nac.isBlank() || nac.isEmpty() ? "" : nac.toUpperCase();
+                String nacMayus = nac  == null ? "" : nac.toUpperCase();
                 nacMayus = this.validarNacionalidad(nacMayus);
                 Nacionalidades nacionalidadPersona = nacionalidadesRepository.find_by_name(nacMayus);
                 responsePersona.setNacionalidad(nacionalidadPersona);
 
-                String estadoCivilAValidar = persona.getEstadoCivil().isEmpty() || persona.getEstadoCivil().isBlank()? "": persona.getEstadoCivil().substring(0, persona.getEstadoCivil().length()-1).toUpperCase();
+                String estadoCivilAValidar = persona.getEstadoCivil()  == null? "": persona.getEstadoCivil().substring(0, persona.getEstadoCivil().length()-1).toUpperCase();
                 String estadoCivilValidado = validarEstadoCivil(estadoCivilAValidar);
                 EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(estadoCivilValidado);
                 responsePersona.setEstadoCivil(estadoCivilPersona);
@@ -349,15 +360,16 @@ public class BoletinesOficialesService {
         List<Persona> personasOrdPorRel = new ArrayList<>();
 
         Map<String, String> relaciones = new HashMap<>();
-        Map<String, Persona> relacionesPersona = new HashMap<>();
+        Map<String, Persona> relacionesPersona = new HashMap<>(); // TODO cambiar el nombre a: nombresConSuPersona
         for (Persona p : personas) {
-            relaciones.put(p.getNombre(), p.getCasadoConIntegrante());
+            // TODO agregar verificacion de null en ambos nombres
+            relaciones.put(p.getNombre(), p.getCasadoConIntegrante() == null? "": p.getCasadoConIntegrante());
             relacionesPersona.put(p.getNombre(), p);
         }
 
         for (Persona p : personas) {
             String nombreInteranteCasado = relaciones.get(p.getNombre());
-            if (!nombreInteranteCasado.isEmpty() || !nombreInteranteCasado.isBlank()) {
+            if (!nombreInteranteCasado.isEmpty()) {
                 personasOrdPorRel.add(p);
                 Persona integranteCasado = relacionesPersona.get(nombreInteranteCasado);
                 personasOrdPorRel.add(integranteCasado);

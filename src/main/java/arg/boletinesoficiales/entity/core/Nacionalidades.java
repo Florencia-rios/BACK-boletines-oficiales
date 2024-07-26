@@ -12,11 +12,11 @@ public class Nacionalidades {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="id")
+    @Column(name="ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="nombre")
+    @Column(name="NOMBRE")
     private String nombre;
-    @Column(name="codigo")
+    @Column(name="CODIGO")
     private String codigo;
 }

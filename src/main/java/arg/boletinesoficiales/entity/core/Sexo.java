@@ -12,11 +12,11 @@ public class Sexo {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="id")
+    @Column(name="ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="nombre")
-    private String nombre; // femenino, masculino, sociedad
-    @Column(name="codigo")
-    private String codigo; // F o M o S
+    @Column(name="NOMBRE")
+    private String nombre;
+    @Column(name="CODIGO")
+    private String codigo;
 }

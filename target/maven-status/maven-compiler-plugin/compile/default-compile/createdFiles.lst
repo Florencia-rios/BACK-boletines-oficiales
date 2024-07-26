@@ -6,6 +6,7 @@ arg/boletinesoficiales/dto/SociedadDto.class
 arg/boletinesoficiales/repository/core/NacionalidadesRepository.class
 arg/boletinesoficiales/restcontroller/BoletinesOficialesRestController.class
 arg/boletinesoficiales/dto/BoletinesficialesRequest.class
+arg/boletinesoficiales/service/nlp/NLPBoletinesOficiales.class
 arg/boletinesoficiales/models/SociedadNLP.class
 arg/boletinesoficiales/BoletinesOficialesApplication.class
 arg/boletinesoficiales/repository/core/EstadoCivilRepository.class
