@@ -71,9 +71,9 @@ public class BoletinesOficialesService {
             List<SociedadNLP> sociedades = entitiesPorSociedad.getSociedadNLP();
             contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
-            List<Persona> personas = entitiesPorSociedad.getPersonas();
-            List<Persona> personasOrdPorRel = validarRelacion(personas); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
             SociedadNLP sociedadNLP = sociedades.get(0);
+            List<Persona> personas = entitiesPorSociedad.getPersonas();
+            List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
             if (!sociedadNLP.getDisolucion().equals("Si")) {
                 obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
             }
@@ -96,8 +96,7 @@ public class BoletinesOficialesService {
                 if (sociedadNLP.getDisolucion().equals("Si")) {
                     responseSociedad.setSociedadCategoria("DOC");
 
-                    boolean fechaValida = validarFormatoFechas(sociedadNLP.getFechaCargo());
-                    String fechaCargoSociedad = fechaValida? sociedadNLP.getFechaCargo(): "";
+                    String fechaCargoSociedad = validarFormatoFechas(sociedadNLP.getFechaCargo());
                     responseSociedad.setFechaCargo(!(fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank()) ? sociedadNLP.getFechaCargo() : fechaInsercionBoletin);
                 } else {
                     responseSociedad.setFechaCargo(fechaBoletin);
@@ -106,16 +105,15 @@ public class BoletinesOficialesService {
             responseSociedad.setContador(contador);
             responseSociedad.setNombreCompleto(sociedadNLP.getNombre());
 
-            boolean fechaValida = validarFormatoFechas(sociedadNLP.getFechaConstitucion());
-            String fechaConstitucion = fechaValida? sociedadNLP.getFechaConstitucion(): "";
+            String fechaConstitucion = validarFormatoFechas(sociedadNLP.getFechaConstitucion());
             responseSociedad.setFechaNacimiento(fechaConstitucion);
             responseSociedad.setDocumento(sociedadNLP.getCuit());
             Direccion direccionSoc = sociedadNLP.getDireccion();
             responseSociedad.setCalle(direccionSoc.getCalle());
             responseSociedad.setAltura(direccionSoc.getAltura());
 
-            String piso = direccionSoc.getPiso() == null? "": direccionSoc.getPiso();
-            String depto = direccionSoc.getDepartamento() == null? "": direccionSoc.getDepartamento();
+            String piso = direccionSoc.getPiso() == null ? "" : direccionSoc.getPiso();
+            String depto = direccionSoc.getDepartamento() == null ? "" : direccionSoc.getDepartamento();
             String pisoDepto = piso + " " + depto;
             responseSociedad.setPisoDepto(pisoDepto.strip());
             responseSociedad.setLocalidad(direccionSoc.getLocalidad());
@@ -160,22 +158,12 @@ public class BoletinesOficialesService {
         for (Persona persona : personasOrdPorRel) {
 
             String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
-
-            String cargoPersonaMayus = persona.getCargo() == null  ? "" : persona.getCargo().toUpperCase();
-            String cargoOut = validarCargo(cargoPersonaMayus);
-            if (cargoOut.isEmpty() && fuenteCargo.equals("BAJ")) {
-                // TODO poner logica de baja sin cargo en el documento y sobre escribir la variable cargoOut
-                //  primero obtener el tipo societario (vienen con puntos)
-                //  en base a eso, setear el cargoOut en base a lo que existe en el maestro
-
-                String[] tiposSocietarios = {"SRL", "SA", "SH", "SCA", "SCS", "UTE", "SAS", "SAU"};
-
-            }
+            String cargoOut = obtenerCargoValidoOVacio(persona, fuenteCargo, sociedadNLP);
 
             if (!cargoOut.isEmpty()) {
                 Sociedad responsePersona = new Sociedad();
 
-                Cargos cargoPersona = cargosRepository.findByName(cargoOut);
+                Cargos cargoPersona = cargosRepository.find_by_name(cargoOut);
                 responsePersona.setCargo(cargoPersona);
 
                 responsePersona.setFuenteCargo(fuenteCargo);
@@ -188,15 +176,13 @@ public class BoletinesOficialesService {
                     responsePersona.setUsuario("M");
                     responsePersona.setSector("MD");
 
-                    boolean fechaValida = validarFormatoFechas(persona.getFechaCargo());
-                    String fechaCargoSociedad = fechaValida? persona.getFechaCargo(): "";
+                    String fechaCargoSociedad = validarFormatoFechas(persona.getFechaCargo());
                     responsePersona.setFechaCargo(fechaCargoSociedad);
                 }
                 responsePersona.setContador(contador);
                 responsePersona.setNombreCompleto(persona.getNombre());
 
-                boolean fechaValida = validarFormatoFechas(persona.getFechaNacimiento());
-                String fechaNacimiento = fechaValida? persona.getFechaNacimiento(): "";
+                String fechaNacimiento = validarFormatoFechas(persona.getFechaNacimiento());
                 responsePersona.setFechaNacimiento(fechaNacimiento);
                 responsePersona.setDocumento(persona.getDocumento());
                 responsePersona.setTelefono(persona.getTelefono());
@@ -204,8 +190,8 @@ public class BoletinesOficialesService {
                 responsePersona.setCalle(direccionPer.getCalle());
                 responsePersona.setAltura(direccionPer.getAltura());
 
-                String piso = direccionPer.getPiso() == null? "": direccionPer.getPiso();
-                String depto = direccionPer.getDepartamento() == null? "": direccionPer.getDepartamento();
+                String piso = direccionPer.getPiso() == null ? "" : direccionPer.getPiso();
+                String depto = direccionPer.getDepartamento() == null ? "" : direccionPer.getDepartamento();
                 String pisoDepto = piso + " " + depto;
                 responsePersona.setPisoDepto(pisoDepto.strip());
                 responsePersona.setLocalidad(direccionPer.getLocalidad());
@@ -214,7 +200,7 @@ public class BoletinesOficialesService {
                 responsePersona.setFechaInsercionBoletin(fechaInsercionBoletin);
 
                 String sex = persona.getSexo();
-                String sexMayus = sex == null || sex.isBlank() || sex.isEmpty()? "NO APORTADO" : sex.toUpperCase();
+                String sexMayus = sex == null || sex.isBlank() || sex.isEmpty() ? "NO APORTADO" : sex.toUpperCase();
                 String sexValidado = validarSexo(sexMayus);
                 Sexo sexoPersona = sexoRepository.find_by_name(sexValidado);
                 responsePersona.setSexo(sexoPersona);
@@ -229,17 +215,17 @@ public class BoletinesOficialesService {
                 responsePersona.setProvincia(provinciaPersona);
 
                 String nac = persona.getPais();
-                String nacMayus = nac  == null ? "" : nac.toUpperCase();
+                String nacMayus = nac == null ? "" : nac.toUpperCase();
                 nacMayus = this.validarNacionalidad(nacMayus);
                 Nacionalidades nacionalidadPersona = nacionalidadesRepository.find_by_name(nacMayus);
                 responsePersona.setNacionalidad(nacionalidadPersona);
 
-                String estadoCivilAValidar = persona.getEstadoCivil()  == null? "": persona.getEstadoCivil().substring(0, persona.getEstadoCivil().length()-1).toUpperCase();
+                String estadoCivilAValidar = persona.getEstadoCivil() == null || persona.getEstadoCivil().isEmpty() ? "" : persona.getEstadoCivil().substring(0, persona.getEstadoCivil().length() - 1).toUpperCase();
                 String estadoCivilValidado = validarEstadoCivil(estadoCivilAValidar);
                 EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(estadoCivilValidado);
                 responsePersona.setEstadoCivil(estadoCivilPersona);
 
-                if (persona.getConyuge().equals("C")) {
+                if (persona.getConyuge() != null && persona.getConyuge().equals("C")) {
                     responsePersona.setRelacion("C");
                 }
 
@@ -250,15 +236,19 @@ public class BoletinesOficialesService {
         }
     }
 
-    private boolean validarFormatoFechas(String fecha){
+    private String validarFormatoFechas(String fecha) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
 
         try {
-            sdf.parse(fecha);
-            return true;
+            if (fecha != null) {
+                sdf.parse(fecha);
+                return fecha;
+            } else {
+                return "";
+            }
         } catch (ParseException e) {
-            return false;
+            return "";
         }
     }
 
@@ -356,32 +346,99 @@ public class BoletinesOficialesService {
 
     // Este metodo ordena a la lista de personas para que las personas casadas queden en secuencia
     // dentro de las parejas, la que aparece segunda es la que llevará seteado C de conyuge
-    private List<Persona> validarRelacion(List<Persona> personas) {
+    private List<Persona> validarRelacion(List<Persona> personas, SociedadNLP sociedadNLP) {
         List<Persona> personasOrdPorRel = new ArrayList<>();
 
         Map<String, String> relaciones = new HashMap<>();
-        Map<String, Persona> relacionesPersona = new HashMap<>(); // TODO cambiar el nombre a: nombresConSuPersona
+        Map<String, Persona> nombresConSuPersona = new HashMap<>();
         for (Persona p : personas) {
-            // TODO agregar verificacion de null en ambos nombres
-            relaciones.put(p.getNombre(), p.getCasadoConIntegrante() == null? "": p.getCasadoConIntegrante());
-            relacionesPersona.put(p.getNombre(), p);
+            relaciones.put(p.getNombre() == null ? "" : p.getNombre(), p.getCasadoConIntegrante() == null ? "" : p.getCasadoConIntegrante());
+            nombresConSuPersona.put(p.getNombre() == null ? "" : p.getNombre(), p);
         }
 
         for (Persona p : personas) {
             String nombreInteranteCasado = relaciones.get(p.getNombre());
             if (!nombreInteranteCasado.isEmpty()) {
+
                 personasOrdPorRel.add(p);
-                Persona integranteCasado = relacionesPersona.get(nombreInteranteCasado);
-                personasOrdPorRel.add(integranteCasado);
+                Persona conyuge = nombresConSuPersona.get(nombreInteranteCasado);
 
-                integranteCasado.setConyuge("C");
+                if(conyuge != null) {
+                    personasOrdPorRel.add(conyuge);
 
-                relaciones.remove(nombreInteranteCasado);
-                relacionesPersona.remove(nombreInteranteCasado);
-                personas.remove(integranteCasado);
+                    // chequeo si alguno de los dos tienen un cargo invalido, si es asi no tengo que setear el C en el conyuge
+                    String fuenteCargo = conyuge.getEsBaja().equals("Si") ? "BAJ" : "BOL";
+                    String cargoOutIntegranteCasado = obtenerCargoValidoOVacio(p, fuenteCargo, sociedadNLP);
+                    String cargoOutConyuge = obtenerCargoValidoOVacio(conyuge, fuenteCargo, sociedadNLP);
+                    if (!(cargoOutIntegranteCasado.isEmpty() || cargoOutConyuge.isEmpty())) {
+                        conyuge.setConyuge("C");
+                    }
+
+                    relaciones.remove(nombreInteranteCasado);
+                    nombresConSuPersona.remove(nombreInteranteCasado);
+                    personas.remove(conyuge);
+                }
+
+            } else {
+                personasOrdPorRel.add(p);
             }
+
         }
 
         return personasOrdPorRel;
+    }
+
+    private String obtenerCargoValidoOVacio(Persona persona, String fuenteCargo, SociedadNLP sociedadNLP) {
+
+        String cargoPersonaMayus = persona.getCargo() == null ? "" : persona.getCargo().toUpperCase();
+        String cargoOut = validarCargo(cargoPersonaMayus);
+        if (cargoOut.isEmpty() && fuenteCargo.equals("BAJ")) {
+            String tipoSocietario = validarTipoSocietario(sociedadNLP.getNombre());
+            switch(tipoSocietario) {
+                case "SRL":
+                    cargoOut = "SG";
+                    break;
+                case "SA":
+                    cargoOut = "PR";
+                    break;
+                case "SH":
+                    cargoOut = "SO";
+                    break;
+                case "SCA":
+                    cargoOut = "SB";
+                    break;
+                case "SCS":
+                    cargoOut = "SB";
+                    break;
+                case "UTE":
+                    cargoOut = "LR";
+                    break;
+                case "SAS":
+                    cargoOut = "DO";
+                    break;
+                case "SAU":
+                    cargoOut = "PR";
+                    break;
+                default:
+                    // code block
+            }
+
+        }
+        return cargoOut;
+    }
+
+    private String validarTipoSocietario(String nombreSociedad) {
+        String[] tiposSocietarios = {"SRL", "SA", "SH", "SCA", "SCS", "UTE", "SAS", "SAU"};
+
+        String tipoSocOut = "";
+        for (String tipoSoc : tiposSocietarios) {
+            Pattern pattern = Pattern.compile("\\b" + tipoSoc.toUpperCase() + "\\b");
+            Matcher matcher = pattern.matcher(nombreSociedad.replace(".", ""));
+            if (matcher.find()) {
+                tipoSocOut = tipoSoc;
+            }
+        }
+
+        return tipoSocOut;
     }
 }

@@ -2,10 +2,6 @@ package arg.boletinesoficiales.service;
 
 import arg.boletinesoficiales.entity.user.Sociedad;
 import arg.boletinesoficiales.models.ResponseNLP;
-import arg.boletinesoficiales.repository.core.EstadoCivilRepository;
-import arg.boletinesoficiales.repository.core.ProvinciasRepository;
-import arg.boletinesoficiales.repository.core.SexoRepository;
-import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.nlp.NLPBoletinesOficiales;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +29,8 @@ public class BoletinesOficialesServiceTests {
     BoletinesOficialesService boletinesOficialesService;
     Mocks mocks = new Mocks();
 
-    @Autowired
-    private SexoRepository sexoRepository;
-    @Autowired
-    private ProvinciasRepository provinciasRepository;
-    @Autowired
-    private SociedadRepository sociedadRepository;
-    @Autowired
-    private EstadoCivilRepository estadoCivilRepository;
-
     @MockBean
     private NLPBoletinesOficiales nlpBoletinesOficiales;
-
-    @Test
-    void xx(){
-        estadoCivilRepository.findAll();
-    }
 
     @Test
     void altaSociedad() {
@@ -69,8 +51,110 @@ public class BoletinesOficialesServiceTests {
 
         // assertion
         assertEquals(2, response.size());
-        System.out.println("FIND ALL: "+sociedadRepository.findAll().size());
+    }
 
+    @Test
+    void modificacionSociedadSinCausa() {
+        // set up
+        List<String> boletinesOficiales = new ArrayList<>(); // parametro
+        String boletinOficial = mocks.boletinOficial(); // parametro
+        boletinesOficiales.add(boletinOficial);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaBoletin = fechaActual.format(formatter); // parametro
+        ResponseNLP responseNLP = mocks.modificacionSociedadSinCausa();
 
+        // mock
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+
+        // execution
+        List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
+
+        // assertion
+        assertEquals(2, response.size());
+    }
+
+    @Test
+    void disolucionSociedad() {
+        // set up
+        List<String> boletinesOficiales = new ArrayList<>(); // parametro
+        String boletinOficial = mocks.boletinOficial(); // parametro
+        boletinesOficiales.add(boletinOficial);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaBoletin = fechaActual.format(formatter); // parametro
+        ResponseNLP responseNLP = mocks.disolucionSociedad();
+
+        // mock
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+
+        // execution
+        List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
+
+        // assertion
+        assertEquals(1, response.size());
+    }
+
+    @Test
+    void modificacionSociedadConBaja() {
+        // set up
+        List<String> boletinesOficiales = new ArrayList<>(); // parametro
+        String boletinOficial = mocks.boletinOficial(); // parametro
+        boletinesOficiales.add(boletinOficial);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaBoletin = fechaActual.format(formatter); // parametro
+        ResponseNLP responseNLP = mocks.modificacionSociedadConBaja();
+
+        // mock
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+
+        // execution
+        List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
+
+        // assertion
+        assertEquals(2, response.size());
+    }
+
+    @Test
+    void modificacionSociedadConDA() {
+        // set up
+        List<String> boletinesOficiales = new ArrayList<>(); // parametro
+        String boletinOficial = mocks.boletinOficial(); // parametro
+        boletinesOficiales.add(boletinOficial);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaBoletin = fechaActual.format(formatter); // parametro
+        ResponseNLP responseNLP = mocks.modificacionSociedadConDA();
+
+        // mock
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+
+        // execution
+        List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
+
+        // assertion
+        assertEquals(2, response.size());
+    }
+
+    @Test
+    void modificacionSociedadConAB() {
+        // set up
+        List<String> boletinesOficiales = new ArrayList<>(); // parametro
+        String boletinOficial = mocks.boletinOficial(); // parametro
+        boletinesOficiales.add(boletinOficial);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaBoletin = fechaActual.format(formatter); // parametro
+        ResponseNLP responseNLP = mocks.modificacionSociedadConAB();
+
+        // mock
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+
+        // execution
+        List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
+
+        // assertion
+        assertEquals(2, response.size());
     }
 }

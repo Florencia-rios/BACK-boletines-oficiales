@@ -3,131 +3,148 @@ package arg.boletinesoficiales.entity.user;
 import arg.boletinesoficiales.entity.core.*;
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="SOCIEDAD")
+@Table(name="sociedad")
 @Getter
 public class Sociedad {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="ID")
+    @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="MOR_USER")
-    private String usuario; // M o A
-    @Column(name="MOR_NRO_USER")
-    @ColumnDefault(value = "62")
-    private String nroUsuario;
-    @Column(name="MOR_LOTE")
-    @ColumnDefault(value = "0")
-    private String lote;
-    @Column(name="MOR_CODINT")
+
+    @Column(name="mor_user")
+    private String usuario = "";
+
+    @Column(name="mor_nro_user")
+    private String nroUsuario = "62";
+
+    @Column(name="mor_lote")
+    private String lote = "0";
+
+    @Column(name="mor_codint")
     private int contador;
-    @Column(name="MOR_MATRIZ")
-    @ColumnDefault(value = "AA0029")
-    private String matriz;
-    @Column(name="MOR_SUCURSAL")
-    @ColumnDefault(value = "9999")
-    private String sucursal;
-    @Column(name="MOR_SECTOR")
-    private String sector; // PC, para altas, y MD para modificaciones
-    @Column(name="MOR_CLIENTE")
-    @ColumnDefault(value = "")
-    private String cliente;
-    @Column(name="MOR_NOMBRE_COMPLETO")
+
+    @Column(name="mor_matriz")
+    private String matriz = "AA0029";
+
+    @Column(name="mor_sucursal")
+    private String sucursal = "9999";
+
+    @Column(name="mor_sector")
+    private String sector;
+
+    @Column(name="mor_cliente")
+    private String cliente = "";
+
+    @Column(name="mor_nombre_completo")
     private String nombreCompleto;
-    @Column(name="MOR_FECHA_NAC")
-    private String fechaNacimiento;  // (aaaammdd o dd/mm/aaaa)
-    @OneToOne
-    @JoinColumn(name="MOR_SEXO_ID")
-    private Sexo sexo;
-    @Column(name="MOR_DOCUMENTO1")
-    private String documento;
-    @Column(name="MOR_DOCUMENTO2")
-    @ColumnDefault(value = "")
-    private String cedula;
+
+    @Column(name="mor_fecha_nac")
+    private String fechaNacimiento = "";
 
     @OneToOne
-    @JoinColumn(name="MOR_PROV_DOC2_ID")
+    @JoinColumn(name="mor_sexo_id")
+    private Sexo sexo;
+
+    @Column(name="mor_documento1")
+    private String documento = "";
+
+    @Column(name="mor_documento2")
+    private String cedula = "";
+
+    @OneToOne
+    @JoinColumn(name="mor_prov_doc2_id")
     private Provincias provinciaEmisionCedula;
 
-    @Column(name="MOR_TELEFONO")
-    private String telefono;
-    @Column(name="MOR_MARCA_DIRE_1")
-    @ColumnDefault(value = "S")
-    private String marcaDireccion; // S o J, S el domicilio separado
-    @Column(name="MOR_CALLE")
-    private String calle;
-    @Column(name="MOR_NUMER")
-    private String altura;
-    @Column(name="MOR_PISO")
-    private String pisoDepto;
-    @Column(name="MOR_LOCA")
-    private String localidad;
+    @Column(name="mor_telefono")
+    private String telefono = "";
+
+    @Column(name="mor_marca_dire_1")
+    private String marcaDireccion = "S";
+
+    @Column(name="mor_calle")
+    private String calle = "";
+
+    @Column(name="mor_numer")
+    private String altura = "";
+
+    @Column(name="mor_piso")
+    private String pisoDepto = "";
+
+    @Column(name="mor_loca")
+    private String localidad = "";
 
     @OneToOne
-    @JoinColumn(name="MOR_PROV_ID")
+    @JoinColumn(name="mor_prov_id")
     private Provincias provincia;
 
-    @Column(name="MOR_CP")
-    private String codigoPostal;
+    @Column(name="mor_cp")
+    private String codigoPostal = "";
+
     @OneToOne
-    @JoinColumn(name="MOR_EST_CIVIL_ID")
+    @JoinColumn(name="mor_est_civil_id")
     private EstadoCivil estadoCivil;
+
     @OneToOne
-    @JoinColumn(name="MOR_NACIONALIDAD_ID")
+    @JoinColumn(name="mor_nacionalidad_id")
     private Nacionalidades nacionalidad;
-    @Column(name="MOR_RELACION")
-    private String relacion; // si esta casado con el integrante anterior, va C
+
+    @Column(name="mor_relacion")
+    private String relacion = "";
+
     @OneToOne
-    @JoinColumn(name="MOR_CARGO_ID")
+    @JoinColumn(name="mor_cargo_id")
     private Cargos cargo;
-    @Column(name="MOR_CARGO_FECHA")
-    private String fechaCargo;  // (aaaammdd o dd/mm/aaaa)
-    @Column(name="MOR_CARGO_FUENTE")
-    @ColumnDefault(value = "BOL")
-    private String fuenteCargo; // sólo si el integrante correspondiente se dió de baja en la sociedad, va BAJ
-    @Column(name="MOR_ANT_CODIGO")
-    @ColumnDefault(value = "XXX")
-    private String antCodigo; // siempre es "XXX"
-    @Column(name="MOR_CAMPO_1")
-    @ColumnDefault(value = "")
-    private String campo1;
-    @Column(name="MOR_CAMPO_2")
-    @ColumnDefault(value = "")
-    private String campo2;
-    @Column(name="MOR_CAMPO_3")
-    @ColumnDefault(value = "")
-    private String campo3;
-    @Column(name="MOR_CAMPO_4")
-    @ColumnDefault(value = "")
-    private String campo4;
-    @Column(name="MOR_CAMPO_5")
-    @ColumnDefault(value = "")
-    private String campo5;
-    @Column(name="MOR_CAMPO_6")
-    @ColumnDefault(value = "")
-    private String campo6;
-    @Column(name="MOR_CAMPO_7")
-    @ColumnDefault(value = "")
-    private String campo7;
-    @Column(name="MOR_CAMPO_8")
-    @ColumnDefault(value = "")
-    private String campo8;
-    @Column(name="MOR_ANT_FECHA")
-    @ColumnDefault(value = "")
-    private String antFecha;  // (aaaammdd o dd/mm/aaaa)
-    @Column(name="MOR_ARCHIVO")
-    @ColumnDefault(value = "")
-    private String archivo;
-    @Column(name="MOR_SOC_CATEGORIA")
-    @ColumnDefault(value = "")
-    private String sociedadCategoria; // Sólo es DOC si la sociedad se disolvió
-    @Column(name = "FECHA_INSERCION_BOLETIN")
-    private String fechaInsercionBoletin; // es la fecha actual, el dia en que pusieron a procesar cada boletin oficial
-    @Column(name = "BOLETIN_OFICIAL") // Doc en base 64
+
+    @Column(name="mor_cargo_fecha")
+    private String fechaCargo = "";
+
+    @Column(name="mor_cargo_fuente")
+    private String fuenteCargo = "BOL";
+
+    @Column(name="mor_ant_codigo")
+    private String antCodigo = "XXX";
+
+    @Column(name="mor_campo_1")
+    private String campo1 = "";
+
+    @Column(name="mor_campo_2")
+    private String campo2 = "";
+
+    @Column(name="mor_campo_3")
+    private String campo3 = "";
+
+    @Column(name="mor_campo_4")
+    private String campo4 = "";
+
+    @Column(name="mor_campo_5")
+    private String campo5 = "";
+
+    @Column(name="mor_campo_6")
+    private String campo6 = "";
+
+    @Column(name="mor_campo_7")
+    private String campo7 = "";
+
+    @Column(name="mor_campo_8")
+    private String campo8 = "";
+
+    @Column(name="mor_ant_fecha")
+    private String antFecha = "";
+
+    @Column(name="mor_archivo")
+    private String archivo = "";
+
+    @Column(name="mor_soc_categoria")
+    private String sociedadCategoria = "";
+
+    @Column(name = "fecha_insercion_boletin")
+    private String fechaInsercionBoletin;
+
+    @Column(name = "boletin_oficial")
     private byte[] boletinOficial;
 
     public void setUsuario(String usuario) {
@@ -163,8 +180,8 @@ public class Sociedad {
     }
 
     public void setNombreCompleto(String nombreCompleto) {
-        String nombre = nombreCompleto.replaceAll("[.-]", "");
-        this.nombreCompleto = nombre.length()>36? nombre.substring(0, 73) : nombre;
+        String nombre = nombreCompleto != null? nombreCompleto.replaceAll("[.-]", "") : "";
+        this.nombreCompleto = nombre.length()>72? nombre.substring(0, 73) : nombre;
     }
 
     public void setFechaNacimiento(String fechaNacimiento) {
@@ -176,12 +193,12 @@ public class Sociedad {
     }
 
     public void setDocumento(String documento) {
-        String doc = documento.replaceAll("[.-]", "");
+        String doc = documento != null? documento.replaceAll("[.-]", "") : "";
         this.documento = doc.length()>11? doc.substring(0, 12) : doc;
     }
 
     public void setCedula(String cedula) {
-        String doc = cedula.replaceAll("[.-]", "");
+        String doc = cedula != null? cedula.replaceAll("[.-]", "") : "";
         this.cedula = doc.length()>11? doc.substring(0, 12) : doc;
     }
 
@@ -190,7 +207,7 @@ public class Sociedad {
     }
 
     public void setTelefono(String telefono) {
-        String tel =  telefono.replaceAll("[.-]", "");
+        String tel = telefono != null? telefono.replaceAll("[.-]", "") : "";
         this.telefono = tel.length()>14? tel.substring(0, 15) : tel;
     }
 
@@ -199,22 +216,22 @@ public class Sociedad {
     }
 
     public void setCalle(String calle) {
-        String c = calle.replaceAll("[.-]", "");
+        String c = calle != null? calle.replaceAll("[.-]", "") : "";
         this.calle = c.length()>40? c.substring(0, 41) : c;
     }
 
     public void setAltura(String altura) {
-        String a = altura.replaceAll("[.-]", "");
+        String a = altura != null? altura.replaceAll("[.-]", "") : "";
         this.altura = a.length()>10? a.substring(0, 11) : a;
     }
 
     public void setPisoDepto(String pisoDepto) {
-        String pD = pisoDepto.replaceAll("[.-]", "");
+        String pD = pisoDepto != null? pisoDepto.replaceAll("[.-]", "") : "";
         this.pisoDepto = pD.length()>6? pD.substring(0, 7) : pD;
     }
 
     public void setLocalidad(String localidad) {
-        String loca = localidad.replaceAll("[.-]", "");
+        String loca = localidad != null? localidad.replaceAll("[.-]", "") : "";
         this.localidad = loca.length()>36? loca.substring(0, 37) : loca;
     }
 
@@ -223,7 +240,7 @@ public class Sociedad {
     }
 
     public void setCodigoPostal(String codigoPostal) {
-        String cP = codigoPostal.replaceAll("[.-]", "");
+        String cP = codigoPostal != null? codigoPostal.replaceAll("[.-]", "") : "";
         this.codigoPostal = cP.length()>8? cP.substring(0, 9) : cP;
     }
 

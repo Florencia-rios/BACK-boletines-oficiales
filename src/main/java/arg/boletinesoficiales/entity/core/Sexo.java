@@ -5,18 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="SEXO")
+@Table(name="sexo")
 @Getter
 @Setter
 public class Sexo {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Integer id;
-    @Column(name="NOMBRE")
+    @Column(name="nombre")
     private String nombre;
-    @Column(name="CODIGO")
+    @Column(name="codigo")
     private String codigo;
 }

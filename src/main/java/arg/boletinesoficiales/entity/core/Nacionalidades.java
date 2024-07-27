@@ -5,18 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="NACIONALIDADES")
+@Table(name="nacionalidades")
 @Getter
 @Setter
 public class Nacionalidades {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="ID")
+    @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="NOMBRE")
+    @Column(name="nombre")
     private String nombre;
-    @Column(name="CODIGO")
+    @Column(name="codigo")
     private String codigo;
 }
