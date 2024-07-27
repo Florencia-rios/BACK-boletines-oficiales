@@ -16,7 +16,7 @@ public class Sexo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name="nombre")
-    private String nombre; // femenino, masculino, sociedad
+    private String nombre;
     @Column(name="codigo")
-    private String codigo; // F o M o S
+    private String codigo;
 }

@@ -3,10 +3,8 @@ package arg.boletinesoficiales.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class Sociedad {
+public class SociedadNLP {
 
     @JsonProperty("nombre")
     private String nombre;
@@ -29,9 +27,9 @@ public class Sociedad {
     @JsonProperty("modificacion")
     private String modificacion;
 
+    @JsonProperty("causaModificacion")
+    private String causaModificacion;
+
     @JsonProperty("fechaCargo")
     private String fechaCargo;
-
-    @JsonProperty("personas")
-    private List<Persona> personas;
 }

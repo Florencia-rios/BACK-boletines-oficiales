@@ -50,7 +50,7 @@ public class MockNLPBoletinesOficiales {
         persona1.setSexo(sexo1);
         persona1.setDocumento(documento1);
         persona1.setFechaNacimiento(fechaNacimiento1);
-        persona1.setNacionalidad(nacionalidad1);
+        persona1.setPais(nacionalidad1);
         persona1.setEstadoCivil(estadoCivil1);
         persona1.setCargo(cargo1);
         persona1.setDireccion(direccionPersona1);
@@ -67,7 +67,7 @@ public class MockNLPBoletinesOficiales {
         persona2.setSexo(sexo2);
         persona2.setDocumento(documento2);
         persona2.setFechaNacimiento(fechaNacimiento2);
-        persona2.setNacionalidad(nacionalidad2);
+        persona2.setPais(nacionalidad2);
         persona2.setEstadoCivil(estadoCivil2);
         persona2.setCargo(cargo2);
         persona2.setDireccion(direccionPersona2);
@@ -77,10 +77,10 @@ public class MockNLPBoletinesOficiales {
         personas.add(persona1);
         personas.add(persona2);
 
-        Sociedad sociedad = new Sociedad();
+        List<SociedadNLP> sociedades = new ArrayList<>();
+        SociedadNLP sociedad = new SociedadNLP();
         String nombreSociedad = "1806 S.A";
         String fechaConstitucion = "19/10/2023";
-//        String cuit = "2740011366";
         Direccion direccionSociedad = new Direccion();
         sociedad.setNombre(nombreSociedad);
         sociedad.setCuit(null);
@@ -89,9 +89,11 @@ public class MockNLPBoletinesOficiales {
         sociedad.setAlta("Si");
         sociedad.setDisolucion("No");
         sociedad.setModificacion("No");
-        sociedad.setPersonas(personas);
+        sociedades.add(sociedad);
 
-        entity.setSociedad(sociedad);
+
+        entity.setSociedadNLP(sociedades);
+        entity.setPersonas(personas);
         entities.add(entity);
 
         responseNLP.setEntities(entities);

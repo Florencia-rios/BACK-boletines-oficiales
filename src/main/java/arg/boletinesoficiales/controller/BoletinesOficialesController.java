@@ -24,7 +24,7 @@ public class BoletinesOficialesController {
 
         BoletinesOficialesResponse response = new BoletinesOficialesResponse();
 
-        List<Sociedad> sociedades = service.procesarBoletinOficial(request.getBoletinesOficiales());
+        List<Sociedad> sociedades = service.procesarBoletinOficial(request.getBoletinesOficiales(), request.getFechaBoletin());
 
         List<SociedadDto> sociedadDtos = sociedades.stream()
                 .map(s -> modelMapper.map(s, SociedadDto.class))
