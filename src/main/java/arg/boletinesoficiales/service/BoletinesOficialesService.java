@@ -6,17 +6,14 @@ import arg.boletinesoficiales.models.*;
 import arg.boletinesoficiales.repository.core.*;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.nlp.NLPBoletinesOficiales;
+import arg.boletinesoficiales.validadores.Validadores;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class BoletinesOficialesService {
@@ -33,6 +30,9 @@ public class BoletinesOficialesService {
     private CargosRepository cargosRepository;
     @Autowired
     private SociedadRepository sociedadRepository;
+
+    @Autowired
+    private Validadores validadores;
 
     @Autowired
     private NLPBoletinesOficiales nlpBoletinesOficiales;
@@ -96,8 +96,8 @@ public class BoletinesOficialesService {
                 if (sociedadNLP.getDisolucion().equals("Si")) {
                     responseSociedad.setSociedadCategoria("DOC");
 
-                    String fechaCargoSociedad = validarFormatoFechas(sociedadNLP.getFechaCargo());
-                    responseSociedad.setFechaCargo(!(fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank()) ? sociedadNLP.getFechaCargo() : fechaInsercionBoletin);
+                    String fechaCargoSociedad = validadores.validarFormatoFechas(sociedadNLP.getFechaCargo());
+                    responseSociedad.setFechaCargo(!(fechaCargoSociedad == null || fechaCargoSociedad.isEmpty() || fechaCargoSociedad.isBlank()) ? sociedadNLP.getFechaCargo() : fechaBoletin);
                 } else {
                     responseSociedad.setFechaCargo(fechaBoletin);
                 }
@@ -105,7 +105,7 @@ public class BoletinesOficialesService {
             responseSociedad.setContador(contador);
             responseSociedad.setNombreCompleto(sociedadNLP.getNombre());
 
-            String fechaConstitucion = validarFormatoFechas(sociedadNLP.getFechaConstitucion());
+            String fechaConstitucion = validadores.validarFormatoFechas(sociedadNLP.getFechaConstitucion());
             responseSociedad.setFechaNacimiento(fechaConstitucion);
             responseSociedad.setDocumento(sociedadNLP.getCuit());
             Direccion direccionSoc = sociedadNLP.getDireccion();
@@ -116,7 +116,6 @@ public class BoletinesOficialesService {
             String depto = direccionSoc.getDepartamento() == null ? "" : direccionSoc.getDepartamento();
             String pisoDepto = piso + " " + depto;
             responseSociedad.setPisoDepto(pisoDepto.strip());
-            responseSociedad.setLocalidad(direccionSoc.getLocalidad());
             responseSociedad.setCodigoPostal(direccionSoc.getCodigoPostal());
             responseSociedad.setRelacion("");
             responseSociedad.setBoletinOficial(boBinario);
@@ -125,12 +124,17 @@ public class BoletinesOficialesService {
             Sexo sexo = sexoRepository.find_by_name("SOCIEDAD");
             responseSociedad.setSexo(sexo);
 
+            responseSociedad.setLocalidad(direccionSoc.getLocalidad());
+
+            String localidad = direccionSoc.getLocalidad();
+            String localidadMayus = localidad == null ? "" : localidad.toUpperCase();
+            boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
             String prov = direccionSoc.getProvincia();
             String provMayus = prov == null ? "" : prov.toUpperCase();
-            if (provMayus.equals("CABA")) {
+            if (localidadCABA || provMayus.equals("CIUDAD DE BUENOS AIRES") || provMayus.equals("CABA")) {
                 provMayus = "CAPITAL FEDERAL";
             }
-            provMayus = this.validarProvincia(provMayus);
+            provMayus = validadores.validarProvincia(provMayus);
             Provincias provincia = provinciasRepository.find_by_name(provMayus);
             responseSociedad.setProvincia(provincia);
 
@@ -160,7 +164,7 @@ public class BoletinesOficialesService {
             String fuenteCargo = persona.getEsBaja().equals("Si") ? "BAJ" : "BOL";
             String cargoOut = obtenerCargoValidoOVacio(persona, fuenteCargo, sociedadNLP);
 
-            if (!cargoOut.isEmpty()) {
+            if (!cargoOut.isEmpty()) { // filtro por cargos validos
                 Sociedad responsePersona = new Sociedad();
 
                 Cargos cargoPersona = cargosRepository.find_by_name(cargoOut);
@@ -176,13 +180,13 @@ public class BoletinesOficialesService {
                     responsePersona.setUsuario("M");
                     responsePersona.setSector("MD");
 
-                    String fechaCargoSociedad = validarFormatoFechas(persona.getFechaCargo());
+                    String fechaCargoSociedad = validadores.validarFormatoFechas(persona.getFechaCargo());
                     responsePersona.setFechaCargo(fechaCargoSociedad);
                 }
                 responsePersona.setContador(contador);
                 responsePersona.setNombreCompleto(persona.getNombre());
 
-                String fechaNacimiento = validarFormatoFechas(persona.getFechaNacimiento());
+                String fechaNacimiento = validadores.validarFormatoFechas(persona.getFechaNacimiento());
                 responsePersona.setFechaNacimiento(fechaNacimiento);
                 responsePersona.setDocumento(persona.getDocumento());
                 responsePersona.setTelefono(persona.getTelefono());
@@ -201,27 +205,30 @@ public class BoletinesOficialesService {
 
                 String sex = persona.getSexo();
                 String sexMayus = sex == null || sex.isBlank() || sex.isEmpty() ? "NO APORTADO" : sex.toUpperCase();
-                String sexValidado = validarSexo(sexMayus);
+                String sexValidado = validadores.validarSexo(sexMayus);
                 Sexo sexoPersona = sexoRepository.find_by_name(sexValidado);
                 responsePersona.setSexo(sexoPersona);
 
+                String localidad = direccionPer.getLocalidad();
+                String localidadMayus = localidad == null ? "" : localidad.toUpperCase();
+                boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
                 String provPersona = direccionPer.getProvincia();
                 String provPersonaMayus = provPersona == null ? "" : provPersona.toUpperCase();
-                if (provPersonaMayus.equals("CIUDAD DE BUENOS AIRES") || provPersonaMayus.equals("CABA")) {
+                if (localidadCABA || provPersonaMayus.equals("CIUDAD DE BUENOS AIRES") || provPersonaMayus.equals("CABA")) {
                     provPersonaMayus = "CAPITAL FEDERAL";
                 }
-                provPersonaMayus = this.validarProvincia(provPersonaMayus);
+                provPersonaMayus = validadores.validarProvincia(provPersonaMayus);
                 Provincias provinciaPersona = provinciasRepository.find_by_name(provPersonaMayus);
                 responsePersona.setProvincia(provinciaPersona);
 
                 String nac = persona.getPais();
                 String nacMayus = nac == null ? "" : nac.toUpperCase();
-                nacMayus = this.validarNacionalidad(nacMayus);
+                nacMayus = validadores.validarNacionalidad(nacMayus);
                 Nacionalidades nacionalidadPersona = nacionalidadesRepository.find_by_name(nacMayus);
                 responsePersona.setNacionalidad(nacionalidadPersona);
 
                 String estadoCivilAValidar = persona.getEstadoCivil() == null || persona.getEstadoCivil().isEmpty() ? "" : persona.getEstadoCivil().substring(0, persona.getEstadoCivil().length() - 1).toUpperCase();
-                String estadoCivilValidado = validarEstadoCivil(estadoCivilAValidar);
+                String estadoCivilValidado = validadores.validarEstadoCivil(estadoCivilAValidar);
                 EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(estadoCivilValidado);
                 responsePersona.setEstadoCivil(estadoCivilPersona);
 
@@ -234,114 +241,6 @@ public class BoletinesOficialesService {
                 contador++;
             }
         }
-    }
-
-    private String validarFormatoFechas(String fecha) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        sdf.setLenient(false);
-
-        try {
-            if (fecha != null) {
-                sdf.parse(fecha);
-                return fecha;
-            } else {
-                return "";
-            }
-        } catch (ParseException e) {
-            return "";
-        }
-    }
-
-    private String validarSexo(String sexoIn) {
-        String[] sexo = {
-                "MASCULINO", "FEMENINO", "NO APORTADO", "SOCIEDAD"
-        };
-
-        String sexoOut = "";
-        for (String s : sexo) {
-            Pattern pattern = Pattern.compile("\\b" + s + "\\b");
-            Matcher matcher = pattern.matcher(sexoIn);
-            if (matcher.find()) {
-                sexoOut = s;
-            }
-        }
-
-        return sexoOut;
-    }
-
-    private String validarCargo(String cargoIn) {
-        String[] cargos = {
-                "ABSORBIDA", "GERENTE", "Director Titular", "Presidente",
-                "Representante Legal", "Socio Solidario", "Socio Comanditado",
-                "Socio Comanditario", "Socio Gerente", "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA",
-                "DENOMINACION ANTERIOR", "ESCINDIDA", "Vicepresidente", "Vicepresidente Primero", "Vicepresidente Segundo",
-                "Vicepresidente Tercero", "Vicepresidente Cuarto", "FUSION", "UTE"
-        };
-
-        String cargoOut = "";
-        for (String cargo : cargos) {
-            Pattern pattern = Pattern.compile("\\b" + cargo.toUpperCase() + "\\b");
-            Matcher matcher = pattern.matcher(cargoIn);
-            if (matcher.find()) {
-                cargoOut = cargo;
-            }
-        }
-
-        return cargoOut;
-    }
-
-    private String validarProvincia(String provIn) {
-        String[] provincias = {
-                "SALTA", "BUENOS AIRES", "CAPITAL FEDERAL", "SAN LUIS", "ENTRE RIOS",
-                "LA RIOJA", "SANTIAGO DEL ESTERO", "CHACO", "SAN JUAN", "CATAMARCA",
-                "LA PAMPA", "MENDOZA", "MISIONES", "FORMOSA", "NEUQUEN", "RIO NEGRO",
-                "SANTA FE", "TUCUMAN", "CHUBUT", "TIERRA DEL FUEGO", "CORRIENTES",
-                "CORDOBA", "JUJUY", "SANTA CRUZ"
-        };
-
-        String provOut = "";
-        for (String provincia : provincias) {
-            Pattern pattern = Pattern.compile("\\b" + provincia + "\\b");
-            Matcher matcher = pattern.matcher(provIn);
-            if (matcher.find()) {
-                provOut = provincia;
-            }
-        }
-
-        return provOut;
-    }
-
-    private String validarNacionalidad(String nacIn) {
-        String[] nacionalidades = {"ARGENTINA", "ALEMANIA", "AUSTRALIA", "BOLIVIA", "BRASIL", "COLOMBIA", "CUBA", "CANADA",
-                "CHECOSLOVAQUIA", "CHILE", "CHINA", "ESPAÑA", "ECUADOR", "FRANCIA", "GRAN BRETAÑA", "HOLANDA", "ITALIA",
-                "IRLANDA", "JAPON", "KOREA", "MEXICO", "EXTRANJERO", "PERU", "PORTUGAL", "PARAGUAY", "SUECIA", "SUIZA",
-                "TAIWAN", "URUGUAY", "ESTADOS UNIDOS", "EXTRANJERO", "YUGOSLAVIA"};
-
-        String nacOut = "";
-        for (String nacionalidad : nacionalidades) {
-            Pattern pattern = Pattern.compile("\\b" + nacionalidad + "\\b");
-            Matcher matcher = pattern.matcher(nacIn);
-            if (matcher.find()) {
-                nacOut = nacionalidad;
-            }
-        }
-
-        return nacOut;
-    }
-
-    private String validarEstadoCivil(String estadoCivilIn) {
-        String[] estadoCivil = {"Soltero", "Casado", "Divorciado"};
-
-        String estadoCivilOut = "";
-        for (String ec : estadoCivil) {
-            Pattern pattern = Pattern.compile("\\b" + ec.toUpperCase() + "\\b");
-            Matcher matcher = pattern.matcher(estadoCivilIn);
-            if (matcher.find()) {
-                estadoCivilOut = ec;
-            }
-        }
-
-        return estadoCivilOut;
     }
 
     // Este metodo ordena a la lista de personas para que las personas casadas queden en secuencia
@@ -363,7 +262,7 @@ public class BoletinesOficialesService {
                 personasOrdPorRel.add(p);
                 Persona conyuge = nombresConSuPersona.get(nombreInteranteCasado);
 
-                if(conyuge != null) {
+                if (conyuge != null) {
                     personasOrdPorRel.add(conyuge);
 
                     // chequeo si alguno de los dos tienen un cargo invalido, si es asi no tengo que setear el C en el conyuge
@@ -391,54 +290,40 @@ public class BoletinesOficialesService {
     private String obtenerCargoValidoOVacio(Persona persona, String fuenteCargo, SociedadNLP sociedadNLP) {
 
         String cargoPersonaMayus = persona.getCargo() == null ? "" : persona.getCargo().toUpperCase();
-        String cargoOut = validarCargo(cargoPersonaMayus);
+        String cargoOut = validadores.validarCargo(cargoPersonaMayus);
         if (cargoOut.isEmpty() && fuenteCargo.equals("BAJ")) {
-            String tipoSocietario = validarTipoSocietario(sociedadNLP.getNombre());
-            switch(tipoSocietario) {
+            String tipoSocietario = validadores.validarTipoSocietario(sociedadNLP.getNombre());
+            switch (tipoSocietario) {
                 case "SRL":
-                    cargoOut = "SG";
+                    cargoOut = "Socio Gerente";
                     break;
                 case "SA":
-                    cargoOut = "PR";
+                    cargoOut = "Presidente";
                     break;
                 case "SH":
-                    cargoOut = "SO";
+                    cargoOut = "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA";
                     break;
                 case "SCA":
-                    cargoOut = "SB";
+                    cargoOut = "Socio Comanditado";
                     break;
                 case "SCS":
-                    cargoOut = "SB";
+                    cargoOut = "Socio Comanditado";
                     break;
                 case "UTE":
-                    cargoOut = "LR";
+                    cargoOut = "Representante Legal";
                     break;
                 case "SAS":
-                    cargoOut = "DO";
+                    cargoOut = "Directivo";
                     break;
                 case "SAU":
-                    cargoOut = "PR";
+                    cargoOut = "Presidente";
                     break;
                 default:
-                    // code block
+                    cargoOut = "";
             }
 
         }
         return cargoOut;
     }
 
-    private String validarTipoSocietario(String nombreSociedad) {
-        String[] tiposSocietarios = {"SRL", "SA", "SH", "SCA", "SCS", "UTE", "SAS", "SAU"};
-
-        String tipoSocOut = "";
-        for (String tipoSoc : tiposSocietarios) {
-            Pattern pattern = Pattern.compile("\\b" + tipoSoc.toUpperCase() + "\\b");
-            Matcher matcher = pattern.matcher(nombreSociedad.replace(".", ""));
-            if (matcher.find()) {
-                tipoSocOut = tipoSoc;
-            }
-        }
-
-        return tipoSocOut;
-    }
 }

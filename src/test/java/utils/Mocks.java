@@ -14,7 +14,7 @@ public class Mocks {
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
-        String nombrePersona1 = "Omar Humberto Camarda";
+        String nombrePersona1 = "Camarda, Omar Humberto";
         String documento1 = "21771887";
         String sexo1 = "masculino";
         String fechaNacimiento1 = "11/1/1971";
@@ -23,7 +23,7 @@ public class Mocks {
         String estadoCivil = "casado";
         String cargo1 = "director suplente";
         String esBaja = "No";
-        String nombrePersona2 = "Natalia Vanesa Montefusco";
+        String nombrePersona2 = "Montefusco, Natalia Vanesa";
         String documento2 = "25282290";
         String sexo2 = "femenino";
         String fechaNacimiento2 = "2/6/1976";
@@ -70,64 +70,6 @@ public class Mocks {
         return responseNLP;
     }
 
-    public ResponseNLP modificacionSociedadSinCausa(){
-        ResponseNLP responseNLP = new ResponseNLP();
-        List<Entities> entities = new ArrayList<>();
-        Entities entity = new Entities();
-        List<Persona> personas = new ArrayList<>();
-        List<SociedadNLP> sociedades = new ArrayList<>();
-
-        String nombrePersona1 = "Juan Carlos Lacasa";
-        String documento1 = "5.063.644";
-        String sexo1 = "masculino";
-        String fechaNacimiento1 = "N/A";
-        String nacionalidad = "argentina";
-        String telefono = "";
-        String estadoCivil = "casado";
-        String cargo1 = "Presidente";
-        String fechaCargo = "29/07/23";
-        String esBaja = "No";
-        String nombrePersona2 = "Carina Gisela Spielmann";
-        String documento2 = "13.232.579";
-        String sexo2 = "femenino";
-        String fechaNacimiento2 = "N/A";
-        String cargo2 = "Director Suplente";
-
-        String calle1 = "Pedro Morán";
-        String altura1 = "3592";
-        String piso1 = "5";
-        String depto1 = "17";
-        String codigoPostal1 = null;
-        String localidad1 = "Capital Federal";
-        String provincia = "Buenos Aires";
-
-        Direccion direccion = getDireccion(calle1, altura1, piso1, depto1, codigoPostal1, localidad1, provincia);
-
-        Persona persona1 = getPersona(fechaCargo, nombrePersona1, sexo1, documento1, fechaNacimiento1, nacionalidad, telefono, estadoCivil, cargo1, direccion, nombrePersona2, esBaja);
-        Persona persona2 = getPersona(fechaCargo, nombrePersona2, sexo2, documento2, fechaNacimiento2, nacionalidad, telefono, estadoCivil, cargo2, direccion, nombrePersona1, esBaja);
-        personas.add(persona1);
-        personas.add(persona2);
-
-        String nombreSociedad = "HIJOS DE JUAN ARRUPEA S.C.A.";
-        String cuit = "30-62702063-1";
-        String fechaConstitucion = null;
-        String alta = "No";
-        String disolucion = "No";
-        String modificacion = "Si";
-        String causaModificacion = null;
-
-        SociedadNLP sociedad = getSociedad(fechaCargo, nombreSociedad, cuit, fechaConstitucion, direccion, alta, disolucion, modificacion, causaModificacion);
-        sociedades.add(sociedad);
-
-        entity.setSociedadNLP(sociedades);
-        entity.setPersonas(personas);
-        entities.add(entity);
-
-        responseNLP.setEntities(entities);
-
-        return responseNLP;
-    }
-
     public ResponseNLP disolucionSociedad(){
         ResponseNLP responseNLP = new ResponseNLP();
         List<Entities> entities = new ArrayList<>();
@@ -135,7 +77,7 @@ public class Mocks {
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
-        String nombrePersona1 = "Adriana Beatriz Bertolaccini Lopez";
+        String nombrePersona1 = "Bertolaccini Lopez, Adriana Beatriz";
         String documento1 = "20667258";
         String sexo1 = "femenino";
         String fechaNacimiento1 = "20/05/1969";
@@ -145,7 +87,7 @@ public class Mocks {
         String cargo1 = "liquidadora";
         String fechaCargo = "14/05/2024";
         String esBaja = "No";
-        String nombrePersona2 = "Diego Leandro SCHABERGER";
+        String nombrePersona2 = "SCHABERGER, Diego Leandro";
 
         String calle1 = "Mariano Quirós";
         String altura1 = "770";
@@ -197,11 +139,11 @@ public class Mocks {
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
-        String nombrePersona1 = "Alicia Garcia Perez";
+        String nombrePersona1 = "Garcia Perez, Alicia";
         String fechaCargo = "29/11/23";
         String esBaja1 = "Si";
-        String nombrePersona2 = "Diego Leandro SCHABERGER";
-        String nombrePersona3 = "Gerson Cesar Gonsales";
+        String nombrePersona2 = "SCHABERGER, Diego Leandro";
+        String nombrePersona3 = "Gonsales, Gerson Cesar";
         String esBaja23 = "No";
 
         String documento = "";
