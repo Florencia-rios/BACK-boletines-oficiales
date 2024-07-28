@@ -34,7 +34,7 @@ public class BoletinesOficialesControllerTests {
     BoletinesOficialesController boletinesOficialesController;
 
     @Test
-    void altaDeSociedadesObtenerLosCamposRequeridos() {
+    void altaDeSociedadesObtenerLosCamposRequeridosq() {
         // set up
         List<String> boletinesOficiales = new ArrayList<>(); // parametro
         String boletinOficial = mocks.boletinOficial(); // parametro
