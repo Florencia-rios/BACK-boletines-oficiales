@@ -31,35 +31,6 @@ public class BoletinesOficialesServiceTests {
     @MockBean
     private NLPBoletinesOficiales nlpBoletinesOficiales;
 
-//    @Autowired
-//    BoletinesOficialesController boletinesOficialesController;
-
-//    @Test
-//    void xxx(){
-//        // set up
-//        List<String> boletinesOficiales = new ArrayList<>(); // parametro
-//        String boletinOficial = mocks.boletinOficial(); // parametro
-//        boletinesOficiales.add(boletinOficial);
-//        LocalDate fechaActual = LocalDate.now();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-//        String fechaBoletin = fechaActual.format(formatter); // parametro
-//
-//        BoletinesficialesRequest request = new BoletinesficialesRequest();
-//        request.setBoletinesOficiales(boletinesOficiales);
-//        request.setFechaBoletin(fechaBoletin);
-//
-//        ResponseNLP responseNLP = mocks.altaSociedad();
-//
-//        // mock
-//        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
-//
-//        // execution
-//        BoletinesOficialesResponse response = boletinesOficialesController.procesarBoletinOficial(request);
-//
-//        // assertion
-//        assertEquals(2, response.getDataSociedades().size());
-//    }
-
     @Test
     void altaSociedad() {
         // set up
