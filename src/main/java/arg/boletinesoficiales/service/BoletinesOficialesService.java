@@ -46,8 +46,29 @@ public class BoletinesOficialesService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String fechaInsercionBoletin = fechaActual.format(formatter);
 
-            ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidades(boletinOficial);
+            ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesBO(boletinOficial);
             byte[] boBinario = Base64.getDecoder().decode(boletinOficial);
+            List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
+
+            sociedadRepository.saveAll(dataSociedades);
+
+            responseTodosBoletines.addAll(dataSociedades);
+        }
+
+        return responseTodosBoletines;
+    }
+
+    @Transactional
+    public List<Sociedad> procesarSoloSociedades(List<String> sociedades, String fechaBoletin) {
+        List<Sociedad> responseTodosBoletines = new ArrayList<>();
+
+        for (String sociedad : sociedades) {
+            LocalDate fechaActual = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String fechaInsercionBoletin = fechaActual.format(formatter);
+
+            ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesSoc(sociedad);
+            byte[] boBinario = Base64.getDecoder().decode(sociedad);
             List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
 
             sociedadRepository.saveAll(dataSociedades);

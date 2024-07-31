@@ -1,8 +1,9 @@
 package arg.boletinesoficiales.controller;
 
-import arg.boletinesoficiales.dto.BoletinesOficialesResponse;
-import arg.boletinesoficiales.dto.BoletinesficialesRequest;
-import arg.boletinesoficiales.dto.SociedadDto;
+import arg.boletinesoficiales.dto.response.Response;
+import arg.boletinesoficiales.dto.request.BoletinesficialesRequest;
+import arg.boletinesoficiales.dto.response.SociedadDto;
+import arg.boletinesoficiales.dto.request.SoloSociedadesRequest;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.BoletinesOficialesService;
 import org.modelmapper.ModelMapper;
@@ -22,9 +23,9 @@ public class BoletinesOficialesController {
     @Autowired
     private ModelMapper modelMapper;
 
-    public BoletinesOficialesResponse procesarBoletinOficial(BoletinesficialesRequest request) {
+    public Response procesarBoletinOficial(BoletinesficialesRequest request) {
 
-        BoletinesOficialesResponse response = new BoletinesOficialesResponse();
+        Response response = new Response();
 
         service.procesarBoletinOficial(request.getBoletinesOficiales(), request.getFechaBoletin());
 
@@ -34,7 +35,19 @@ public class BoletinesOficialesController {
         return response;
     }
 
-    public List<SociedadDto> getSociedadByFechaInsercionBoletin(String fechaInsercionBoletin) {
+    public Response procesarSociedad(SoloSociedadesRequest request) {
+
+        Response response = new Response();
+
+        service.procesarSoloSociedades(request.getSociedades(), request.getFechaBoletin());
+
+        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(request.getFechaBoletin());
+        response.setDataSociedades(sociedadDtos);
+
+        return response;
+    }
+
+    private List<SociedadDto> getSociedadByFechaInsercionBoletin(String fechaInsercionBoletin) {
         List<Object[]> results = sociedadRepository.findSociedadByFechaInsercionBoletin(fechaInsercionBoletin);
         return mapToSociedadDto(results);
     }

@@ -1,4 +1,4 @@
-package arg.boletinesoficiales.dto;
+package arg.boletinesoficiales.dto.response;
 
 import lombok.Data;
 

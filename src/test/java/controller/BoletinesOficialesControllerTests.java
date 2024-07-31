@@ -1,8 +1,8 @@
 package controller;
 
 import arg.boletinesoficiales.controller.BoletinesOficialesController;
-import arg.boletinesoficiales.dto.BoletinesOficialesResponse;
-import arg.boletinesoficiales.dto.BoletinesficialesRequest;
+import arg.boletinesoficiales.dto.response.Response;
+import arg.boletinesoficiales.dto.request.BoletinesficialesRequest;
 import arg.boletinesoficiales.models.ResponseNLP;
 import arg.boletinesoficiales.service.BoletinesOficialesService;
 import arg.boletinesoficiales.service.nlp.NLPBoletinesOficiales;
@@ -50,10 +50,10 @@ public class BoletinesOficialesControllerTests {
         ResponseNLP responseNLP = mocks.altaSociedad();
 
         // mock
-        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidadesBO(boletinOficial);
 
         // execution
-        BoletinesOficialesResponse response = boletinesOficialesController.procesarBoletinOficial(request);
+        Response response = boletinesOficialesController.procesarBoletinOficial(request);
 
         // assertion
         assertEquals(2, response.getDataSociedades().size());

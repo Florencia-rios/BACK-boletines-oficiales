@@ -43,7 +43,7 @@ public class BoletinesOficialesServiceTests {
         ResponseNLP responseNLP = mocks.altaSociedad();
 
         // mock
-        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidadesBO(boletinOficial);
 
         // execution
         List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
@@ -64,7 +64,7 @@ public class BoletinesOficialesServiceTests {
         ResponseNLP responseNLP = mocks.disolucionSociedad();
 
         // mock
-        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidadesBO(boletinOficial);
 
         // execution
         List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
@@ -85,7 +85,7 @@ public class BoletinesOficialesServiceTests {
         ResponseNLP responseNLP = mocks.modificacionSociedadConBaja();
 
         // mock
-        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidadesBO(boletinOficial);
 
         // execution
         List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
@@ -106,7 +106,7 @@ public class BoletinesOficialesServiceTests {
         ResponseNLP responseNLP = mocks.modificacionSociedadConDA();
 
         // mock
-        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidadesBO(boletinOficial);
 
         // execution
         List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
@@ -127,7 +127,7 @@ public class BoletinesOficialesServiceTests {
         ResponseNLP responseNLP = mocks.modificacionSociedadConAB();
 
         // mock
-        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidades(boletinOficial);
+        doReturn(responseNLP).when(nlpBoletinesOficiales).extraerEntidadesBO(boletinOficial);
 
         // execution
         List<Sociedad> response = boletinesOficialesService.procesarBoletinOficial(boletinesOficiales, fechaBoletin);
