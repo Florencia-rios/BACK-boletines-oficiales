@@ -103,7 +103,7 @@ public class BoletinesOficialesService {
                 }
             }
             responseSociedad.setContador(contador);
-            responseSociedad.setNombreCompleto(sociedadNLP.getNombre());
+            responseSociedad.setNombreCompleto(sociedadNLP.getNombre().toUpperCase());
 
             String fechaConstitucion = validadores.validarFormatoFechas(sociedadNLP.getFechaConstitucion());
             responseSociedad.setFechaNacimiento(fechaConstitucion);
@@ -124,10 +124,10 @@ public class BoletinesOficialesService {
             Sexo sexo = sexoRepository.find_by_name("SOCIEDAD");
             responseSociedad.setSexo(sexo);
 
-            responseSociedad.setLocalidad(direccionSoc.getLocalidad());
-
             String localidad = direccionSoc.getLocalidad();
             String localidadMayus = localidad == null ? "" : localidad.toUpperCase();
+            responseSociedad.setLocalidad(localidadMayus);
+
             boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
             String prov = direccionSoc.getProvincia();
             String provMayus = prov == null ? "" : prov.toUpperCase();
@@ -184,7 +184,7 @@ public class BoletinesOficialesService {
                     responsePersona.setFechaCargo(fechaCargoSociedad);
                 }
                 responsePersona.setContador(contador);
-                responsePersona.setNombreCompleto(persona.getNombre());
+                responsePersona.setNombreCompleto(persona.getNombre().toUpperCase());
 
                 String fechaNacimiento = validadores.validarFormatoFechas(persona.getFechaNacimiento());
                 responsePersona.setFechaNacimiento(fechaNacimiento);
@@ -198,7 +198,6 @@ public class BoletinesOficialesService {
                 String depto = direccionPer.getDepartamento() == null ? "" : direccionPer.getDepartamento();
                 String pisoDepto = piso + " " + depto;
                 responsePersona.setPisoDepto(pisoDepto.strip());
-                responsePersona.setLocalidad(direccionPer.getLocalidad());
                 responsePersona.setCodigoPostal(direccionPer.getCodigoPostal());
                 responsePersona.setBoletinOficial(boBinario);
                 responsePersona.setFechaInsercionBoletin(fechaInsercionBoletin);
@@ -211,6 +210,8 @@ public class BoletinesOficialesService {
 
                 String localidad = direccionPer.getLocalidad();
                 String localidadMayus = localidad == null ? "" : localidad.toUpperCase();
+                responsePersona.setLocalidad(localidadMayus);
+
                 boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
                 String provPersona = direccionPer.getProvincia();
                 String provPersonaMayus = provPersona == null ? "" : provPersona.toUpperCase();
