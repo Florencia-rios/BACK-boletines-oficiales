@@ -1,14 +1,16 @@
 package arg.boletinesoficiales.controller;
 
-import arg.boletinesoficiales.dto.response.Response;
 import arg.boletinesoficiales.dto.request.BoletinesficialesRequest;
-import arg.boletinesoficiales.dto.response.SociedadDto;
+import arg.boletinesoficiales.dto.request.NLPGenerarArchivosRequest;
 import arg.boletinesoficiales.dto.request.SoloSociedadesRequest;
+import arg.boletinesoficiales.dto.response.Response;
+import arg.boletinesoficiales.dto.response.SociedadDto;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.BoletinesOficialesService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +22,13 @@ public class BoletinesOficialesController {
     private BoletinesOficialesService service;
     @Autowired
     private SociedadRepository sociedadRepository;
+
+    @Value("${application.rul.base}")
+    private String urlBase;
+    @Value("${application.url.extraer_entidades_bo}")
+    private String urlExtraerEntidadesBO;
     @Autowired
-    private ModelMapper modelMapper;
+    private RestTemplate restTemplate;
 
     public Response procesarBoletinOficial(BoletinesficialesRequest request) {
 
@@ -32,7 +39,16 @@ public class BoletinesOficialesController {
         List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(request.getFechaBoletin());
         response.setDataSociedades(sociedadDtos);
 
+        generarArchivosCSV(sociedadDtos);
+
         return response;
+    }
+
+    private void generarArchivosCSV(List<SociedadDto> sociedadDtos) {
+        NLPGenerarArchivosRequest requestNLP = new NLPGenerarArchivosRequest();
+        requestNLP.setData(sociedadDtos);
+
+        restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, requestNLP, Object.class);
     }
 
     public Response procesarSociedad(SoloSociedadesRequest request) {
