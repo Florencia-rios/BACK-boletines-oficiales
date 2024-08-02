@@ -87,18 +87,20 @@ public class BoletinesOficialesService {
         // una o mas sociedades secundarias, y las personas o integrantes de la sociedad principal
         List<Sociedad> responseFinal = new ArrayList<>();
 
-        Entities entities = responseNLP.getEntities(); // lista de entities es porque cada objeto ENTITIES es una SOCIEDAD del boletin oficial que estoy procesando
+        List<Entities> responseNLPEntities = responseNLP.getEntities(); // lista de entities es porque cada objeto ENTITIES es una SOCIEDAD del boletin oficial que estoy procesando
 
-        int contador = 0;
+        for (Entities entities : responseNLPEntities) {
+            int contador = 0;
 
-        List<SociedadNLP> sociedades = entities.getSociedadNLP();
-        contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
+            List<SociedadNLP> sociedades = entities.getSociedadNLP();
+            contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
-        SociedadNLP sociedadNLP = sociedades.get(0);
-        List<Persona> personas = entities.getPersonas();
-        List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
-        if (!sociedadNLP.getDisolucion().equals("Si")) {
-            obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+            SociedadNLP sociedadNLP = sociedades.get(0);
+            List<Persona> personas = entities.getPersonas();
+            List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+            if (!sociedadNLP.getDisolucion().equals("Si")) {
+                obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+            }
         }
 
 

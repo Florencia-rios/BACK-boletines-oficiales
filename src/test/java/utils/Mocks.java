@@ -9,6 +9,7 @@ public class Mocks {
 
     public ResponseNLP altaSociedad(){
         ResponseNLP responseNLP = new ResponseNLP();
+        List<Entities> responseNLPEntities = new ArrayList<>();
         Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
@@ -63,13 +64,16 @@ public class Mocks {
         entities.setSociedadNLP(sociedades);
         entities.setPersonas(personas);
 
-        responseNLP.setEntities(entities);
+        responseNLPEntities.add(entities);
+
+        responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
 
     public ResponseNLP disolucionSociedad(){
         ResponseNLP responseNLP = new ResponseNLP();
+        List<Entities> responseNLPEntities = new ArrayList<>();
         Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
@@ -123,13 +127,16 @@ public class Mocks {
         entities.setSociedadNLP(sociedades);
         entities.setPersonas(personas);
 
-        responseNLP.setEntities(entities);
+        responseNLPEntities.add(entities);
+
+        responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
 
     public ResponseNLP modificacionSociedadConBaja(){
         ResponseNLP responseNLP = new ResponseNLP();
+        List<Entities> responseNLPEntities = new ArrayList<>();
         Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
@@ -179,13 +186,16 @@ public class Mocks {
         entities.setSociedadNLP(sociedades);
         entities.setPersonas(personas);
 
-        responseNLP.setEntities(entities);
+        responseNLPEntities.add(entities);
+
+        responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
 
     public ResponseNLP modificacionSociedadConDA(){
         ResponseNLP responseNLP = new ResponseNLP();
+        List<Entities> responseNLPEntities = new ArrayList<>();
         Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
@@ -217,13 +227,16 @@ public class Mocks {
         entities.setSociedadNLP(sociedades);
         entities.setPersonas(personas);
 
-        responseNLP.setEntities(entities);
+        responseNLPEntities.add(entities);
+
+        responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
 
     public ResponseNLP modificacionSociedadConAB(){
         ResponseNLP responseNLP = new ResponseNLP();
+        List<Entities> responseNLPEntities = new ArrayList<>();
         Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
@@ -253,7 +266,9 @@ public class Mocks {
         entities.setSociedadNLP(sociedades);
         entities.setPersonas(personas);
 
-        responseNLP.setEntities(entities);
+        responseNLPEntities.add(entities);
+
+        responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
