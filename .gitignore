@@ -1,8 +1,5 @@
 .log/
-mvnw
-mvnw.cmd
 .idea/
-.mvn/
 .target/
 .DS_Store/
 ./target/
