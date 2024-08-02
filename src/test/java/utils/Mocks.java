@@ -9,8 +9,7 @@ public class Mocks {
 
     public ResponseNLP altaSociedad(){
         ResponseNLP responseNLP = new ResponseNLP();
-        List<Entities> entities = new ArrayList<>();
-        Entities entity = new Entities();
+        Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
@@ -61,9 +60,8 @@ public class Mocks {
         SociedadNLP sociedad = getSociedad(null, nombreSociedad, cuit, fechaConstitucion, direccionPersona1, alta, disolucion, modificacion, causaModificacion);
         sociedades.add(sociedad);
 
-        entity.setSociedadNLP(sociedades);
-        entity.setPersonas(personas);
-        entities.add(entity);
+        entities.setSociedadNLP(sociedades);
+        entities.setPersonas(personas);
 
         responseNLP.setEntities(entities);
 
@@ -72,8 +70,7 @@ public class Mocks {
 
     public ResponseNLP disolucionSociedad(){
         ResponseNLP responseNLP = new ResponseNLP();
-        List<Entities> entities = new ArrayList<>();
-        Entities entity = new Entities();
+        Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
@@ -123,9 +120,8 @@ public class Mocks {
         SociedadNLP sociedad = getSociedad(fechaCargo, nombreSociedad, cuit, fechaConstitucion, direccionSoc, alta, disolucion, modificacion, causaModificacion);
         sociedades.add(sociedad);
 
-        entity.setSociedadNLP(sociedades);
-        entity.setPersonas(personas);
-        entities.add(entity);
+        entities.setSociedadNLP(sociedades);
+        entities.setPersonas(personas);
 
         responseNLP.setEntities(entities);
 
@@ -134,8 +130,7 @@ public class Mocks {
 
     public ResponseNLP modificacionSociedadConBaja(){
         ResponseNLP responseNLP = new ResponseNLP();
-        List<Entities> entities = new ArrayList<>();
-        Entities entity = new Entities();
+        Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
@@ -181,9 +176,8 @@ public class Mocks {
         SociedadNLP sociedad = getSociedad(fechaCargo, nombreSociedad, cuit, fechaConstitucion, direccion, alta, disolucion, modificacion, causaModificacion);
         sociedades.add(sociedad);
 
-        entity.setSociedadNLP(sociedades);
-        entity.setPersonas(personas);
-        entities.add(entity);
+        entities.setSociedadNLP(sociedades);
+        entities.setPersonas(personas);
 
         responseNLP.setEntities(entities);
 
@@ -192,8 +186,7 @@ public class Mocks {
 
     public ResponseNLP modificacionSociedadConDA(){
         ResponseNLP responseNLP = new ResponseNLP();
-        List<Entities> entities = new ArrayList<>();
-        Entities entity = new Entities();
+        Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
@@ -221,9 +214,8 @@ public class Mocks {
         sociedades.add(sociedad1);
         sociedades.add(sociedad2);
 
-        entity.setSociedadNLP(sociedades);
-        entity.setPersonas(personas);
-        entities.add(entity);
+        entities.setSociedadNLP(sociedades);
+        entities.setPersonas(personas);
 
         responseNLP.setEntities(entities);
 
@@ -232,8 +224,7 @@ public class Mocks {
 
     public ResponseNLP modificacionSociedadConAB(){
         ResponseNLP responseNLP = new ResponseNLP();
-        List<Entities> entities = new ArrayList<>();
-        Entities entity = new Entities();
+        Entities entities = new Entities();
         List<Persona> personas = new ArrayList<>();
         List<SociedadNLP> sociedades = new ArrayList<>();
 
@@ -259,9 +250,8 @@ public class Mocks {
         sociedades.add(sociedad1);
         sociedades.add(sociedad2);
 
-        entity.setSociedadNLP(sociedades);
-        entity.setPersonas(personas);
-        entities.add(entity);
+        entities.setSociedadNLP(sociedades);
+        entities.setPersonas(personas);
 
         responseNLP.setEntities(entities);
 

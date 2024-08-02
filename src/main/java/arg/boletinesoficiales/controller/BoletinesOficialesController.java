@@ -7,11 +7,14 @@ import arg.boletinesoficiales.dto.response.Response;
 import arg.boletinesoficiales.dto.response.SociedadDto;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.BoletinesOficialesService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,42 +28,53 @@ public class BoletinesOficialesController {
 
     @Value("${application.rul.base}")
     private String urlBase;
-    @Value("${application.url.extraer_entidades_bo}")
-    private String urlExtraerEntidadesBO;
+    @Value("${application.url.generar_archivos}")
+    private String urlGenerarArchivos;
     @Autowired
     private RestTemplate restTemplate;
 
-    public Response procesarBoletinOficial(BoletinesficialesRequest request) {
+    public Response procesarBoletinOficial(BoletinesficialesRequest request) throws JsonProcessingException {
 
         Response response = new Response();
 
         service.procesarBoletinOficial(request.getBoletinesOficiales(), request.getFechaBoletin());
 
-        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(request.getFechaBoletin());
-        response.setDataSociedades(sociedadDtos);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaInsercionBoletin = fechaActual.format(formatter);
+
+        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(fechaInsercionBoletin);
+        response.setData(sociedadDtos);
 
         generarArchivosCSV(sociedadDtos);
 
         return response;
     }
 
-    private void generarArchivosCSV(List<SociedadDto> sociedadDtos) {
-        NLPGenerarArchivosRequest requestNLP = new NLPGenerarArchivosRequest();
-        requestNLP.setData(sociedadDtos);
-
-        restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, requestNLP, Object.class);
-    }
-
-    public Response procesarSociedad(SoloSociedadesRequest request) {
+    public Response procesarSociedad(SoloSociedadesRequest request) throws JsonProcessingException {
 
         Response response = new Response();
 
         service.procesarSoloSociedades(request.getSociedades(), request.getFechaBoletin());
 
-        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(request.getFechaBoletin());
-        response.setDataSociedades(sociedadDtos);
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaInsercionBoletin = fechaActual.format(formatter);
+
+        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(fechaInsercionBoletin);
+        response.setData(sociedadDtos);
+
+        generarArchivosCSV(sociedadDtos);
 
         return response;
+    }
+
+
+    private void generarArchivosCSV(List<SociedadDto> sociedadDtos) {
+        NLPGenerarArchivosRequest requestNLP = new NLPGenerarArchivosRequest();
+        requestNLP.setData(sociedadDtos);
+
+        restTemplate.postForEntity(urlBase+urlGenerarArchivos, requestNLP, Object.class);
     }
 
     private List<SociedadDto> getSociedadByFechaInsercionBoletin(String fechaInsercionBoletin) {

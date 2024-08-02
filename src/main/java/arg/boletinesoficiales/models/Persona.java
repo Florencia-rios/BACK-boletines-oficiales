@@ -1,5 +1,6 @@
 package arg.boletinesoficiales.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -42,5 +43,6 @@ public class Persona {
     @JsonProperty("fechaCargo")
     private String fechaCargo;
 
+    @JsonIgnore
     private String conyuge;
 }

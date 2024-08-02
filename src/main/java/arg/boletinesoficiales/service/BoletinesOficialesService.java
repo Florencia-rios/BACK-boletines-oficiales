@@ -7,6 +7,7 @@ import arg.boletinesoficiales.repository.core.*;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
 import arg.boletinesoficiales.service.nlp.NLPBoletinesOficiales;
 import arg.boletinesoficiales.validadores.Validadores;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,13 +39,14 @@ public class BoletinesOficialesService {
     private NLPBoletinesOficiales nlpBoletinesOficiales;
 
     @Transactional
-    public List<Sociedad> procesarBoletinOficial(List<String> boletinesOficiales, String fechaBoletin) {
+    public List<Sociedad> procesarBoletinOficial(List<String> boletinesOficiales, String fechaBoletin) throws JsonProcessingException {
         List<Sociedad> responseTodosBoletines = new ArrayList<>();
 
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaInsercionBoletin = fechaActual.format(formatter);
+
         for (String boletinOficial : boletinesOficiales) {
-            LocalDate fechaActual = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String fechaInsercionBoletin = fechaActual.format(formatter);
 
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesBO(boletinOficial);
             byte[] boBinario = Base64.getDecoder().decode(boletinOficial);
@@ -59,13 +61,14 @@ public class BoletinesOficialesService {
     }
 
     @Transactional
-    public List<Sociedad> procesarSoloSociedades(List<String> sociedades, String fechaBoletin) {
+    public List<Sociedad> procesarSoloSociedades(List<String> sociedades, String fechaBoletin) throws JsonProcessingException {
         List<Sociedad> responseTodosBoletines = new ArrayList<>();
 
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaInsercionBoletin = fechaActual.format(formatter);
+
         for (String sociedad : sociedades) {
-            LocalDate fechaActual = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String fechaInsercionBoletin = fechaActual.format(formatter);
 
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesSoc(sociedad);
             byte[] boBinario = Base64.getDecoder().decode(sociedad);
@@ -84,21 +87,20 @@ public class BoletinesOficialesService {
         // una o mas sociedades secundarias, y las personas o integrantes de la sociedad principal
         List<Sociedad> responseFinal = new ArrayList<>();
 
-        List<Entities> entities = responseNLP.getEntities(); // lista de entities es porque cada objeto ENTITIES es una SOCIEDAD del boletin oficial que estoy procesando
+        Entities entities = responseNLP.getEntities(); // lista de entities es porque cada objeto ENTITIES es una SOCIEDAD del boletin oficial que estoy procesando
 
-        for (Entities entitiesPorSociedad : entities) {
-            int contador = 0;
+        int contador = 0;
 
-            List<SociedadNLP> sociedades = entitiesPorSociedad.getSociedadNLP();
-            contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
+        List<SociedadNLP> sociedades = entities.getSociedadNLP();
+        contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
-            SociedadNLP sociedadNLP = sociedades.get(0);
-            List<Persona> personas = entitiesPorSociedad.getPersonas();
-            List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
-            if (!sociedadNLP.getDisolucion().equals("Si")) {
-                obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
-            }
+        SociedadNLP sociedadNLP = sociedades.get(0);
+        List<Persona> personas = entities.getPersonas();
+        List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+        if (!sociedadNLP.getDisolucion().equals("Si")) {
+            obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
         }
+
 
         return responseFinal;
     }
@@ -130,7 +132,11 @@ public class BoletinesOficialesService {
             responseSociedad.setFechaNacimiento(fechaConstitucion);
             responseSociedad.setDocumento(sociedadNLP.getCuit());
             Direccion direccionSoc = sociedadNLP.getDireccion();
-            responseSociedad.setCalle(direccionSoc.getCalle());
+
+            String calle = direccionSoc.getCalle();
+            String calleMayus = calle == null ? "" : calle.toUpperCase();
+            responseSociedad.setCalle(calleMayus);
+
             responseSociedad.setAltura(direccionSoc.getAltura());
 
             String piso = direccionSoc.getPiso() == null ? "" : direccionSoc.getPiso();
@@ -212,7 +218,11 @@ public class BoletinesOficialesService {
                 responsePersona.setDocumento(persona.getDocumento());
                 responsePersona.setTelefono(persona.getTelefono());
                 Direccion direccionPer = persona.getDireccion();
-                responsePersona.setCalle(direccionPer.getCalle());
+
+                String calle = direccionPer.getCalle();
+                String calleMayus = calle == null ? "" : calle.toUpperCase();
+                responsePersona.setCalle(calleMayus);
+
                 responsePersona.setAltura(direccionPer.getAltura());
 
                 String piso = direccionPer.getPiso() == null ? "" : direccionPer.getPiso();

@@ -2,6 +2,8 @@ package arg.boletinesoficiales.service.nlp;
 
 import arg.boletinesoficiales.dto.request.NLPExtraerEntidadesRequest;
 import arg.boletinesoficiales.models.ResponseNLP;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -17,27 +19,39 @@ public class NLPBoletinesOficiales {
     @Value("${application.url.extraer_entidades_bo}")
     private String urlExtraerEntidadesBO;
 
-    @Value("${application.url.extraer_entidades_soc")
+    @Value("${application.url.extraer_entidades_soc}")
     private String urlExtraerEntidadesSoc;
 
     @Autowired
     private RestTemplate restTemplate;
 
-    public ResponseNLP extraerEntidadesBO(String boletinOficial) {
+    public ResponseNLP extraerEntidadesBO(String boletinOficial) throws JsonProcessingException {
         NLPExtraerEntidadesRequest request = new NLPExtraerEntidadesRequest();
         request.setDocumento(boletinOficial);
 
-        ResponseEntity<ResponseNLP> responseNLP = restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, request, ResponseNLP.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, request, String.class);
 
-        return responseNLP.getBody();
+        String responseString = response.getBody();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
+
+        return responseNLP;
     }
 
-    public ResponseNLP extraerEntidadesSoc(String sociedad) {
+    public ResponseNLP extraerEntidadesSoc(String sociedad) throws JsonProcessingException {
         NLPExtraerEntidadesRequest request = new NLPExtraerEntidadesRequest();
         request.setDocumento(sociedad);
 
-        ResponseEntity<ResponseNLP> responseNLP = restTemplate.postForEntity(urlBase+urlExtraerEntidadesSoc, request, ResponseNLP.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesSoc, request, String.class);
 
-        return responseNLP.getBody();
+        String responseString = response.getBody();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
+
+        return responseNLP;
     }
 }

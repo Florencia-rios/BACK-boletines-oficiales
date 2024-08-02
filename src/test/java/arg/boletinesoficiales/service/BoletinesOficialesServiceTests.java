@@ -3,10 +3,12 @@ package arg.boletinesoficiales.service;
 import arg.boletinesoficiales.entity.user.Sociedad;
 import arg.boletinesoficiales.models.ResponseNLP;
 import arg.boletinesoficiales.service.nlp.NLPBoletinesOficiales;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import utils.Mocks;
 
 import java.time.LocalDate;
@@ -19,9 +21,11 @@ import static org.mockito.Mockito.doReturn;
 
 //@RunWith(SpringRunner.class)
 //@ConfigurationProperties(prefix = "application-test")
-@SpringBootTest
+//@SpringBootTest
 //@ActiveProfiles("test")
 //@Transactional
+@SpringJUnitConfig
+@WebMvcTest(BoletinesOficialesService.class)
 public class BoletinesOficialesServiceTests {
 
     @Autowired
@@ -32,7 +36,7 @@ public class BoletinesOficialesServiceTests {
     private NLPBoletinesOficiales nlpBoletinesOficiales;
 
     @Test
-    void altaSociedad() {
+    void altaSociedad() throws JsonProcessingException {
         // set up
         List<String> boletinesOficiales = new ArrayList<>(); // parametro
         String boletinOficial = mocks.boletinOficial(); // parametro
@@ -53,7 +57,7 @@ public class BoletinesOficialesServiceTests {
     }
 
     @Test
-    void disolucionSociedad() {
+    void disolucionSociedad() throws JsonProcessingException {
         // set up
         List<String> boletinesOficiales = new ArrayList<>(); // parametro
         String boletinOficial = mocks.boletinOficial(); // parametro
@@ -74,7 +78,7 @@ public class BoletinesOficialesServiceTests {
     }
 
     @Test
-    void modificacionSociedadConBaja() {
+    void modificacionSociedadConBaja() throws JsonProcessingException {
         // set up
         List<String> boletinesOficiales = new ArrayList<>(); // parametro
         String boletinOficial = mocks.boletinOficial(); // parametro
@@ -95,7 +99,7 @@ public class BoletinesOficialesServiceTests {
     }
 
     @Test
-    void modificacionSociedadConDA() {
+    void modificacionSociedadConDA() throws JsonProcessingException {
         // set up
         List<String> boletinesOficiales = new ArrayList<>(); // parametro
         String boletinOficial = mocks.boletinOficial(); // parametro
@@ -116,7 +120,7 @@ public class BoletinesOficialesServiceTests {
     }
 
     @Test
-    void modificacionSociedadConAB() {
+    void modificacionSociedadConAB() throws JsonProcessingException {
         // set up
         List<String> boletinesOficiales = new ArrayList<>(); // parametro
         String boletinOficial = mocks.boletinOficial(); // parametro
