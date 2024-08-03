@@ -26,7 +26,7 @@ public class BoletinesOficialesController {
     @Autowired
     private SociedadRepository sociedadRepository;
 
-    @Value("${application.rul.base}")
+    @Value("${application.url.base}")
     private String urlBase;
     @Value("${application.url.generar_archivos}")
     private String urlGenerarArchivos;

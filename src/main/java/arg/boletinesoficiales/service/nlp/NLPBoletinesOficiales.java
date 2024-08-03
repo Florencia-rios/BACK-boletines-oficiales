@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class NLPBoletinesOficiales {
 
-    @Value("${application.rul.base}")
+    @Value("${application.url.base}")
     private String urlBase;
 
     @Value("${application.url.extraer_entidades_bo}")
