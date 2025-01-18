@@ -3,7 +3,6 @@ package arg.boletinesoficiales.service.nlp;
 import arg.boletinesoficiales.dto.request.NLPExtraerEntidadesRequest;
 import arg.boletinesoficiales.models.ResponseNLP;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -29,29 +28,29 @@ public class NLPBoletinesOficiales {
         NLPExtraerEntidadesRequest request = new NLPExtraerEntidadesRequest();
         request.setDocumento(boletinOficial);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, request, String.class);
+        ResponseEntity<ResponseNLP> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, request, ResponseNLP.class);
 
-        String responseString = response.getBody();
+       // String responseString = response.getBody();
 
-        ObjectMapper objectMapper = new ObjectMapper();
+      //  ObjectMapper objectMapper = new ObjectMapper();
 
-        ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
+     //   ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
 
-        return responseNLP;
+        return response.getBody();
     }
 
     public ResponseNLP extraerEntidadesSoc(String sociedad) throws JsonProcessingException {
         NLPExtraerEntidadesRequest request = new NLPExtraerEntidadesRequest();
         request.setDocumento(sociedad);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesSoc, request, String.class);
+        ResponseEntity<ResponseNLP> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesSoc, request, ResponseNLP.class);
 
-        String responseString = response.getBody();
+        //String responseString = response.getBody();
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        //ObjectMapper objectMapper = new ObjectMapper();
 
-        ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
+        //ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
 
-        return responseNLP;
+        return response.getBody();
     }
 }

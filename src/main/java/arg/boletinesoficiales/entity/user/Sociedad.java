@@ -180,8 +180,8 @@ public class Sociedad {
     }
 
     public void setNombreCompleto(String nombreCompleto) {
-        String nombre = nombreCompleto != null? nombreCompleto.replaceAll("[.-]", "") : "";
-        this.nombreCompleto = nombre.length()>72? nombre.substring(0, 73) : nombre;
+        String nombre = nombreCompleto != null? nombreCompleto.replaceAll("[.-]", "").replace(", ", ",") : "";
+        this.nombreCompleto = nombre.length()>72? nombre.substring(0, 72) : nombre;
     }
 
     public void setFechaNacimiento(String fechaNacimiento) {
@@ -193,13 +193,12 @@ public class Sociedad {
     }
 
     public void setDocumento(String documento) {
-        String doc = documento != null? documento.replaceAll("[.-]", "") : "";
-        this.documento = doc.length()>11? doc.substring(0, 12) : doc;
+        this.documento = documento;
     }
 
     public void setCedula(String cedula) {
         String doc = cedula != null? cedula.replaceAll("[.-]", "") : "";
-        this.cedula = doc.length()>11? doc.substring(0, 12) : doc;
+        this.cedula = doc.length()>11? doc.substring(0, 11) : doc;
     }
 
     public void setProvinciaEmisionCedula(Provincias provinciaEmisionCedula) {
@@ -208,7 +207,7 @@ public class Sociedad {
 
     public void setTelefono(String telefono) {
         String tel = telefono != null? telefono.replaceAll("[.-]", "") : "";
-        this.telefono = tel.length()>14? tel.substring(0, 15) : tel;
+        this.telefono = tel.length()>14? tel.substring(0, 14) : tel;
     }
 
     public void setMarcaDireccion(String marcaDireccion) {
@@ -217,22 +216,22 @@ public class Sociedad {
 
     public void setCalle(String calle) {
         String c = calle != null? calle.replaceAll("[.-]", "") : "";
-        this.calle = c.length()>40? c.substring(0, 41) : c;
+        this.calle = c.length()>40? c.substring(0, 40) : c;
     }
 
     public void setAltura(String altura) {
         String a = altura != null? altura.replaceAll("[.-]", "") : "";
-        this.altura = a.length()>10? a.substring(0, 11) : a;
+        this.altura = a.length()>10? a.substring(0, 10) : a;
     }
 
     public void setPisoDepto(String pisoDepto) {
         String pD = pisoDepto != null? pisoDepto.replaceAll("[.-]", "") : "";
-        this.pisoDepto = pD.length()>6? pD.substring(0, 7) : pD;
+        this.pisoDepto = pD.length()>6? pD.substring(0, 6) : pD;
     }
 
     public void setLocalidad(String localidad) {
         String loca = localidad != null? localidad.replaceAll("[.-]", "") : "";
-        this.localidad = loca.length()>36? loca.substring(0, 37) : loca;
+        this.localidad = loca.length()>36? loca.substring(0, 36) : loca;
     }
 
     public void setProvincia(Provincias provincia) {
@@ -241,7 +240,7 @@ public class Sociedad {
 
     public void setCodigoPostal(String codigoPostal) {
         String cP = codigoPostal != null? codigoPostal.replaceAll("[.-]", "") : "";
-        this.codigoPostal = cP.length()>8? cP.substring(0, 9) : cP;
+        this.codigoPostal = cP.length()>8? cP.substring(0, 8) : cP;
     }
 
     public void setEstadoCivil(EstadoCivil estadoCivil) {

@@ -33,7 +33,7 @@ public class Validadores {
                 "Representante Legal", "Socio Solidario", "Socio Comanditado",
                 "Socio Comanditario", "Socio Gerente", "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA",
                 "DENOMINACION ANTERIOR", "ESCINDIDA", "Vicepresidente", "Vicepresidente Primero", "Vicepresidente Segundo",
-                "Vicepresidente Tercero", "Vicepresidente Cuarto", "FUSION", "UTE"
+                "Vicepresidente Tercero", "Vicepresidente Cuarto", "FUSION", "UTE", "Directivo"
         };
 
         String cargoOut = "";
@@ -42,6 +42,55 @@ public class Validadores {
             Matcher matcher = pattern.matcher(cargoIn);
             if (matcher.find()) {
                 cargoOut = cargo;
+                break;
+            }
+            if (cargoOut.isEmpty()) {
+                switch (cargoIn) {
+                    case "DIRECTORA TITULAR":
+                        cargoOut = "Director Titular";
+                        break;
+                    case "PRESIDENTA":
+                        cargoOut = "Presidente";
+                        break;
+                    case "SOCIA SOLIDARIO":
+                        cargoOut = "Socio Solidario";
+                        break;
+                    case "SOCIA COMANDITADO":
+                        cargoOut = "Socio Comanditado";
+                        break;
+                    case "SOCIA COMANDITARIO":
+                        cargoOut = "Socio Comanditario";
+                        break;
+                    case "SOCIA GERENTE":
+                        cargoOut = "Socio Gerente";
+                        break;
+                    case "VICEPRESIDENTA":
+                        cargoOut = "Vicepresidente";
+                        break;
+                    case "VICEPRESIDENTA PRIMERO":
+                        cargoOut = "Vicepresidente Primero";
+                        break;
+                    case "VICEPRESIDENTA SEGUNDO":
+                        cargoOut = "Vicepresidente Segundo";
+                        break;
+                    case "VICEPRESIDENTA TERCERO":
+                        cargoOut = "Vicepresidente Tercero";
+                        break;
+                    case "VICEPRESIDENTA CUARTO":
+                        cargoOut = "Vicepresidente Cuarto";
+                        break;
+                    default:
+                        cargoOut = "";
+                }
+            }
+            if(cargoOut.isEmpty()){
+                String patron = "(ADMINISTRADOR TITULAR|SOCIO ADMINISTRADOR|REPRESENTANTE|REPRESENTANTE Y USO DE LA FIRMA)";
+                Pattern pattern2 = Pattern.compile(patron);
+                Matcher matcher2 = pattern2.matcher(cargoIn);
+                if (matcher2.find()) {
+                    cargoOut = "Directivo";
+                    break;
+                }
             }
         }
 
@@ -102,7 +151,7 @@ public class Validadores {
     }
 
     public String validarFormatoFechas(String fecha) {
-        SimpleDateFormat sdf = new SimpleDateFormat("DD/MM/YYYY");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
 
         try {
@@ -130,5 +179,29 @@ public class Validadores {
         }
 
         return tipoSocOut;
+    }
+
+    public String cuitValidoSociedades(String cuitIn) {
+        cuitIn = cuitIn != null? cuitIn.replaceAll("[.-]", "") : "";
+
+        String cuitOut = "";
+        // Verifica si el CUIT comienza con "30"
+        if (cuitIn != null && cuitIn.length() == 11 && cuitIn.startsWith("30") && cuitIn.matches("\\d+")) {
+            cuitOut = cuitIn;
+        }
+        return cuitOut;
+    }
+
+    public String documentoValidoPersonas(String docIn) {
+        docIn = docIn != null? docIn.replaceAll("[.-]", "") : "";
+
+        String docOut = "";
+        // Verificar que no sea null y que esté dentro de los límites de longitud
+        if (docIn != null && (docIn.length() >= 6 || docIn.length() <= 11) && docIn.matches("\\d+")) {
+            docOut = docIn;
+        }
+
+        // Verificar que solo contenga números
+        return docOut;
     }
 }

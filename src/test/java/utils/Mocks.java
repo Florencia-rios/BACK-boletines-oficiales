@@ -66,7 +66,7 @@ public class Mocks {
 
         responseNLPEntities.add(entities);
 
-        responseNLP.setEntities(responseNLPEntities);
+       // responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
@@ -129,7 +129,7 @@ public class Mocks {
 
         responseNLPEntities.add(entities);
 
-        responseNLP.setEntities(responseNLPEntities);
+        //responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
@@ -188,7 +188,7 @@ public class Mocks {
 
         responseNLPEntities.add(entities);
 
-        responseNLP.setEntities(responseNLPEntities);
+        //responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
@@ -229,7 +229,7 @@ public class Mocks {
 
         responseNLPEntities.add(entities);
 
-        responseNLP.setEntities(responseNLPEntities);
+        //responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }
@@ -268,7 +268,7 @@ public class Mocks {
 
         responseNLPEntities.add(entities);
 
-        responseNLP.setEntities(responseNLPEntities);
+       // responseNLP.setEntities(responseNLPEntities);
 
         return responseNLP;
     }

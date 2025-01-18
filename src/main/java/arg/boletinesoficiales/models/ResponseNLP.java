@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 public class ResponseNLP {
 
-    @JsonProperty("entidades")
-    private List<Entities> entities;
+    @JsonProperty("entidadesSociedades")
+    private List<EntidadesWrapper> entidadesSociedades;
 }

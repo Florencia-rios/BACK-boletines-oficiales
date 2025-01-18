@@ -72,6 +72,7 @@ public class BoletinesOficialesService {
 
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesSoc(sociedad);
             byte[] boBinario = Base64.getDecoder().decode(sociedad);
+
             List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
 
             sociedadRepository.saveAll(dataSociedades);
@@ -87,25 +88,43 @@ public class BoletinesOficialesService {
         // una o mas sociedades secundarias, y las personas o integrantes de la sociedad principal
         List<Sociedad> responseFinal = new ArrayList<>();
 
-        List<Entities> responseNLPEntities = responseNLP.getEntities(); // lista de entities es porque cada objeto ENTITIES es una SOCIEDAD del boletin oficial que estoy procesando
+        List<EntidadesWrapper> responseNLPEntities = responseNLP.getEntidadesSociedades(); // lista de sociedades con sus respectivas entidades
+        // Itero las sociedades
+        for (EntidadesWrapper entidadesWrapper: responseNLPEntities) {
+            Entities entidadesPorSociedadDeBO = entidadesWrapper.getEntidades();
 
-        for (Entities entities : responseNLPEntities) {
             int contador = 0;
 
-            List<SociedadNLP> sociedades = entities.getSociedadNLP();
-            contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
+            try {
+                List<SociedadNLP> sociedades = entidadesPorSociedadDeBO.getSociedadNLP();
+                if (sociedades.isEmpty()) {
+                    break;
+                }
+                contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
-            SociedadNLP sociedadNLP = sociedades.get(0);
-            List<Persona> personas = entities.getPersonas();
-            List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
-            if (!sociedadNLP.getDisolucion().equals("Si")) {
-                obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+                for (int i = 0; i < responseFinal.size(); i++) {
+                    System.out.println("ResponseFinal hasta sociedades: "+responseFinal.get(i));
+                }
+
+                SociedadNLP sociedadNLP = sociedades.get(0);
+                List<Persona> personas = entidadesPorSociedadDeBO.getPersonas();
+                List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+                if (!sociedadNLP.getDisolucion().equals("Si")) {
+                    obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+
+                    for (int i = 0; i < responseFinal.size(); i++) {
+                        System.out.println("ResponseFinal luego de personas: "+responseFinal.get(i));
+                    }
+
+                }
+            } catch (Exception e) {
+                System.out.println(e);
             }
         }
 
-
         return responseFinal;
     }
+
 
     private int obtenerDataSociedades(byte[] boBinario, String fechaInsercionBoletin, String fechaBoletin, List<SociedadNLP> sociedades, int contador, List<Sociedad> responseFinal) {
         for (SociedadNLP sociedadNLP : sociedades) {
@@ -132,9 +151,11 @@ public class BoletinesOficialesService {
 
             String fechaConstitucion = validadores.validarFormatoFechas(sociedadNLP.getFechaConstitucion());
             responseSociedad.setFechaNacimiento(fechaConstitucion);
-            responseSociedad.setDocumento(sociedadNLP.getCuit());
-            Direccion direccionSoc = sociedadNLP.getDireccion();
 
+            String cuitSoc = validadores.cuitValidoSociedades(sociedadNLP.getCuit());
+            responseSociedad.setDocumento(cuitSoc);
+
+            Direccion direccionSoc = sociedadNLP.getDireccion();
             String calle = direccionSoc.getCalle();
             String calleMayus = calle == null ? "" : calle.toUpperCase();
             responseSociedad.setCalle(calleMayus);
@@ -205,19 +226,21 @@ public class BoletinesOficialesService {
                     responsePersona.setUsuario("A");
                     responsePersona.setSector("PC");
                     responsePersona.setFechaCargo(fechaBoletin);
-                } else if (sociedadNLP.getAlta().equals("No") && (sociedadNLP.getModificacion().equals("Si") || sociedadNLP.getDisolucion().equals("Si"))) {
+                } else if (sociedadNLP.getAlta().equals("No") && sociedadNLP.getModificacion().equals("Si")) {
                     responsePersona.setUsuario("M");
                     responsePersona.setSector("MD");
 
-                    String fechaCargoSociedad = validadores.validarFormatoFechas(persona.getFechaCargo());
-                    responsePersona.setFechaCargo(fechaCargoSociedad);
+                    String fechaCargoPersona = validadores.validarFormatoFechas(persona.getFechaCargo());
+                    responsePersona.setFechaCargo(!(fechaCargoPersona == null || fechaCargoPersona.isEmpty() || fechaCargoPersona.isBlank()) ? fechaCargoPersona : fechaBoletin);
                 }
                 responsePersona.setContador(contador);
                 responsePersona.setNombreCompleto(persona.getNombre().toUpperCase());
 
                 String fechaNacimiento = validadores.validarFormatoFechas(persona.getFechaNacimiento());
                 responsePersona.setFechaNacimiento(fechaNacimiento);
-                responsePersona.setDocumento(persona.getDocumento());
+
+                String documentoPersona = validadores.documentoValidoPersonas(persona.getDocumento());
+                responsePersona.setDocumento(documentoPersona);
                 responsePersona.setTelefono(persona.getTelefono());
                 Direccion direccionPer = persona.getDireccion();
 
