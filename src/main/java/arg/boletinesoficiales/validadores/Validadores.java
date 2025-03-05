@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,18 +152,30 @@ public class Validadores {
     }
 
     public String validarFormatoFechas(String fecha) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        sdf.setLenient(false);
+        if (fecha == null || fecha.isEmpty()) {
+            return "";
+        }
+
+        // Primero, verificar si ya está en formato yyyyMMdd
+        SimpleDateFormat formatoYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
+        formatoYYYYMMDD.setLenient(false); // Para evitar que acepte fechas inválidas
 
         try {
-            if (fecha != null) {
-                sdf.parse(fecha);
-                return fecha;
-            } else {
-                return "";
-            }
+            formatoYYYYMMDD.parse(fecha);
+            return fecha; // Ya está en el formato correcto, se retorna tal cual
+        } catch (ParseException ignored) {
+            // Si falla, significa que no estaba en yyyyMMdd, entonces probamos dd/MM/yyyy
+        }
+
+        // Intentar parsear en formato dd/MM/yyyy y convertirlo a yyyyMMdd
+        SimpleDateFormat formatoDDMMYYYY = new SimpleDateFormat("dd/MM/yyyy");
+        formatoDDMMYYYY.setLenient(false);
+
+        try {
+            Date date = formatoDDMMYYYY.parse(fecha);
+            return formatoYYYYMMDD.format(date); // Convertir a yyyyMMdd
         } catch (ParseException e) {
-            return "";
+            return ""; // Retorna vacío si no coincide con ningún formato válido
         }
     }
 

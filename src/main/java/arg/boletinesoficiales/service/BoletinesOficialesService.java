@@ -90,7 +90,7 @@ public class BoletinesOficialesService {
 
         List<EntidadesWrapper> responseNLPEntities = responseNLP.getEntidadesSociedades(); // lista de sociedades con sus respectivas entidades
         // Itero las sociedades
-        for (EntidadesWrapper entidadesWrapper: responseNLPEntities) {
+        for (EntidadesWrapper entidadesWrapper : responseNLPEntities) {
             Entities entidadesPorSociedadDeBO = entidadesWrapper.getEntidades();
 
             int contador = 0;
@@ -103,7 +103,7 @@ public class BoletinesOficialesService {
                 contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
                 for (int i = 0; i < responseFinal.size(); i++) {
-                    System.out.println("ResponseFinal hasta sociedades: "+responseFinal.get(i));
+                    System.out.println("ResponseFinal hasta sociedades: " + responseFinal.get(i));
                 }
 
                 SociedadNLP sociedadNLP = sociedades.get(0);
@@ -113,7 +113,7 @@ public class BoletinesOficialesService {
                     obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
 
                     for (int i = 0; i < responseFinal.size(); i++) {
-                        System.out.println("ResponseFinal luego de personas: "+responseFinal.get(i));
+                        System.out.println("ResponseFinal luego de personas: " + responseFinal.get(i));
                     }
 
                 }
@@ -148,6 +148,10 @@ public class BoletinesOficialesService {
             }
             responseSociedad.setContador(contador);
             responseSociedad.setNombreCompleto(sociedadNLP.getNombre().toUpperCase());
+
+            if (!responseSociedad.getSociedadCategoria().equals("DOC"))
+                // Si no es una baja, seteo el tipo societario
+                responseSociedad.setSociedadCategoria(validadores.validarTipoSocietario(responseSociedad.getNombreCompleto()));
 
             String fechaConstitucion = validadores.validarFormatoFechas(sociedadNLP.getFechaConstitucion());
             responseSociedad.setFechaNacimiento(fechaConstitucion);
@@ -234,13 +238,20 @@ public class BoletinesOficialesService {
                     responsePersona.setFechaCargo(!(fechaCargoPersona == null || fechaCargoPersona.isEmpty() || fechaCargoPersona.isBlank()) ? fechaCargoPersona : fechaBoletin);
                 }
                 responsePersona.setContador(contador);
-                responsePersona.setNombreCompleto(persona.getNombre().toUpperCase());
+                responsePersona.setNombreCompleto(sociedadNLP.getNombre().toUpperCase());
+
+                if (!sociedadNLP.getDisolucion().equals("Si")) {
+                    // Si no es una baja, seteo el tipo societario
+                    responsePersona.setSociedadCategoria(validadores.validarTipoSocietario(responsePersona.getNombreCompleto()));
+                } else {
+                    responsePersona.setSociedadCategoria(validadores.validarTipoSocietario("DOC"));
+                }
 
                 String fechaNacimiento = validadores.validarFormatoFechas(persona.getFechaNacimiento());
                 responsePersona.setFechaNacimiento(fechaNacimiento);
 
                 String documentoPersona = validadores.documentoValidoPersonas(persona.getDocumento());
-                responsePersona.setDocumento(documentoPersona);
+                responsePersona.setCedula(documentoPersona); // TODO Hay que refactorizar el nombre del campo, porque este campo es el documento del integrante
                 responsePersona.setTelefono(persona.getTelefono());
                 Direccion direccionPer = persona.getDireccion();
 

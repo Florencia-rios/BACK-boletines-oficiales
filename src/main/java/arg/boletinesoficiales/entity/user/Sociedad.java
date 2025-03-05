@@ -53,7 +53,7 @@ public class Sociedad {
     private String documento = "";
 
     @Column(name="mor_documento2")
-    private String cedula = "";
+    private String cedula = ""; // cuit/cuil/documento del integrante
 
     @OneToOne
     @JoinColumn(name="mor_prov_doc2_id")
