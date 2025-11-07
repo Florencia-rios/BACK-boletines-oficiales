@@ -43,10 +43,9 @@ public class BoletinesOficialesController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaInsercionBoletin = fechaActual.format(formatter);
 
-        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(fechaInsercionBoletin);
-        response.setData(sociedadDtos);
+        List<SociedadDto> sociedadDtos = extractedCSV(fechaInsercionBoletin);
 
-        generarArchivosCSV(sociedadDtos);
+        response.setData(sociedadDtos);
 
         return response;
     }
@@ -61,14 +60,19 @@ public class BoletinesOficialesController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaInsercionBoletin = fechaActual.format(formatter);
 
-        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(fechaInsercionBoletin);
-        response.setData(sociedadDtos);
+        List<SociedadDto> sociedadDtos = extractedCSV(fechaInsercionBoletin);
 
-        generarArchivosCSV(sociedadDtos);
+        response.setData(sociedadDtos);
 
         return response;
     }
 
+    public List<SociedadDto> extractedCSV(String fechaInsercionBoletin) {
+        List<SociedadDto> sociedadDtos = getSociedadByFechaInsercionBoletin(fechaInsercionBoletin);
+        generarArchivosCSV(sociedadDtos);
+
+        return sociedadDtos;
+    }
 
     private void generarArchivosCSV(List<SociedadDto> sociedadDtos) {
         NLPGenerarArchivosRequest requestNLP = new NLPGenerarArchivosRequest();

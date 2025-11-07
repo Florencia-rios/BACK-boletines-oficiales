@@ -2,8 +2,8 @@ package arg.boletinesoficiales.restcontroller;
 
 import arg.boletinesoficiales.controller.BoletinesOficialesController;
 import arg.boletinesoficiales.dto.request.BoletinesficialesRequest;
-import arg.boletinesoficiales.dto.response.Response;
 import arg.boletinesoficiales.dto.request.SoloSociedadesRequest;
+import arg.boletinesoficiales.dto.response.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +27,14 @@ public class BoletinesOficialesRestController {
         Response response = controller.procesarBoletinOficial(request);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/csv")
+    public ResponseEntity<String> getArchivos(@RequestParam String fechaInsercionBoletin) {
+
+        controller.extractedCSV(fechaInsercionBoletin);
+
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
     @PostMapping("/api/sociedades")
