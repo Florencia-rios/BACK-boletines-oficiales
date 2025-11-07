@@ -182,21 +182,22 @@ public class BoletinesOficialesService {
             String localidadMayus = localidad == null ? "" : localidad.toUpperCase();
             responseSociedad.setLocalidad(localidadMayus);
 
-            boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
+//            boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
             String prov = direccionSoc.getProvincia();
             String provMayus = prov == null ? "" : prov.toUpperCase();
-            if (localidadCABA || provMayus.equals("CIUDAD DE BUENOS AIRES") || provMayus.equals("CABA")) {
-                provMayus = "CAPITAL FEDERAL";
-            }
-            provMayus = validadores.validarProvincia(provMayus);
+//            if (localidadCABA || provMayus.equals("CIUDAD DE BUENOS AIRES") || provMayus.equals("CABA")) {
+//                provMayus = "CAPITAL FEDERAL";
+//            }
+//            provMayus = validadores.validarProvincia(provMayus);
             Provincias provincia = provinciasRepository.find_by_name(provMayus);
             responseSociedad.setProvincia(provincia);
 
             // CARGOS de sociedad:
-            if (sociedadNLP.getCausaModificacion() != null && sociedadNLP.getModificacion().equals("Si") && sociedadNLP.getCausaModificacion().equals("denominacion anterior")) {
+            // TODO preguntar como reemplazo a absorbente
+            if (sociedadNLP.getCausaModificacion() != null && sociedadNLP.getModificacion().equals("Si") && (sociedadNLP.getCausaModificacion().equals("DENOMINACION ANTERIOR") || sociedadNLP.getCausaModificacion().equals("NUEVA DENOMINACION"))) {
                 Cargos cargoSocNLP = cargosRepository.find_by_code("DA");
                 responseSociedad.setCargo(cargoSocNLP);
-            } else if (sociedadNLP.getCausaModificacion() != null && sociedadNLP.getCausaModificacion().equals("absorbida")) {
+            } else if (sociedadNLP.getCausaModificacion() != null && sociedadNLP.getCausaModificacion().equals("ABSORVIDA")) {
                 Cargos cargoSocNLP = cargosRepository.find_by_code("AB");
                 responseSociedad.setCargo(cargoSocNLP);
             } else {
@@ -271,33 +272,33 @@ public class BoletinesOficialesService {
 
                 String sex = persona.getSexo();
                 String sexMayus = sex == null || sex.isBlank() || sex.isEmpty() ? "NO APORTADO" : sex.toUpperCase();
-                String sexValidado = validadores.validarSexo(sexMayus);
-                Sexo sexoPersona = sexoRepository.find_by_name(sexValidado);
+                //  String sexValidado = validadores.validarSexo(sexMayus);
+                Sexo sexoPersona = sexoRepository.find_by_name(sexMayus);
                 responsePersona.setSexo(sexoPersona);
 
                 String localidad = direccionPer.getLocalidad();
                 String localidadMayus = localidad == null ? "" : localidad.toUpperCase();
                 responsePersona.setLocalidad(localidadMayus);
 
-                boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
+//                boolean localidadCABA = localidadMayus.equals("CAPITAL FEDERAL") || localidadMayus.equals("CIUDAD DE BUENOS AIRES") || localidadMayus.equals("CABA");
                 String provPersona = direccionPer.getProvincia();
                 String provPersonaMayus = provPersona == null ? "" : provPersona.toUpperCase();
-                if (localidadCABA || provPersonaMayus.equals("CIUDAD DE BUENOS AIRES") || provPersonaMayus.equals("CABA")) {
-                    provPersonaMayus = "CAPITAL FEDERAL";
-                }
-                provPersonaMayus = validadores.validarProvincia(provPersonaMayus);
+//                if (localidadCABA || provPersonaMayus.equals("CIUDAD DE BUENOS AIRES") || provPersonaMayus.equals("CABA")) {
+//                    provPersonaMayus = "CAPITAL FEDERAL";
+//                }
+//                provPersonaMayus = validadores.validarProvincia(provPersonaMayus);
                 Provincias provinciaPersona = provinciasRepository.find_by_name(provPersonaMayus);
                 responsePersona.setProvincia(provinciaPersona);
 
                 String nac = persona.getPais();
                 String nacMayus = nac == null ? "" : nac.toUpperCase();
-                nacMayus = validadores.validarNacionalidad(nacMayus);
+//                nacMayus = validadores.validarNacionalidad(nacMayus);
                 Nacionalidades nacionalidadPersona = nacionalidadesRepository.find_by_name(nacMayus);
                 responsePersona.setNacionalidad(nacionalidadPersona);
 
                 String estadoCivilAValidar = persona.getEstadoCivil() == null || persona.getEstadoCivil().isEmpty() ? "" : persona.getEstadoCivil().substring(0, persona.getEstadoCivil().length() - 1).toUpperCase();
-                String estadoCivilValidado = validadores.validarEstadoCivil(estadoCivilAValidar);
-                EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(estadoCivilValidado);
+//                String estadoCivilValidado = validadores.validarEstadoCivil(estadoCivilAValidar);
+                EstadoCivil estadoCivilPersona = estadoCivilRepository.find_by_name(estadoCivilAValidar);
                 responsePersona.setEstadoCivil(estadoCivilPersona);
 
                 if (persona.getConyuge() != null && persona.getConyuge().equals("C")) {
@@ -335,6 +336,8 @@ public class BoletinesOficialesService {
 
                     // chequeo si alguno de los dos tienen un cargo invalido, si es asi no tengo que setear el C en el conyuge
                     String fuenteCargo = conyuge.getEsBaja().equals("Si") ? "BAJ" : "BOL";
+
+                    // El siguiente bloque de código, queda comentado porque se cambió la lógica, ahora en cargo aparece conyuge, no importa si no tiene el cargo real
                     String cargoOutIntegranteCasado = obtenerCargoValidoOVacio(p, fuenteCargo, sociedadNLP);
                     String cargoOutConyuge = obtenerCargoValidoOVacio(conyuge, fuenteCargo, sociedadNLP);
                     if (!(cargoOutIntegranteCasado.isEmpty() || cargoOutConyuge.isEmpty())) {
@@ -357,34 +360,34 @@ public class BoletinesOficialesService {
 
     private String obtenerCargoValidoOVacio(Persona persona, String fuenteCargo, SociedadNLP sociedadNLP) {
 
-        String cargoPersonaMayus = persona.getCargo() == null ? "" : persona.getCargo().toUpperCase();
-        String cargoOut = validadores.validarCargo(cargoPersonaMayus);
+        String cargoOut = persona.getCargo() == null ? "" : persona.getCargo().toUpperCase();
+        //String cargoOut = validadores.validarCargo(cargoPersonaMayus);
         if (cargoOut.isEmpty() && fuenteCargo.equals("BAJ")) {
             String tipoSocietario = validadores.validarTipoSocietario(sociedadNLP.getNombre());
             switch (tipoSocietario) {
                 case "SRL":
-                    cargoOut = "Socio Gerente";
+                    cargoOut = "SOCIO GERENTE";
                     break;
                 case "SA":
-                    cargoOut = "Presidente";
+                    cargoOut = "PRESIDENTE";
                     break;
-                case "SH":
-                    cargoOut = "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA";
-                    break;
+//                case "SH":
+//                    cargoOut = "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA";
+//                    break;
                 case "SCA":
-                    cargoOut = "Socio Comanditado";
+                    cargoOut = "SOCIO COMANDITADO";
                     break;
                 case "SCS":
-                    cargoOut = "Socio Comanditado";
+                    cargoOut = "SOCIO COMANDITADO";
                     break;
                 case "UTE":
-                    cargoOut = "Representante Legal";
+                    cargoOut = "REP. LEGAL";
                     break;
                 case "SAS":
-                    cargoOut = "Directivo";
+                    cargoOut = "DIRECTIVO";
                     break;
                 case "SAU":
-                    cargoOut = "Presidente";
+                    cargoOut = "PRESIDENTE";
                     break;
                 default:
                     cargoOut = "";

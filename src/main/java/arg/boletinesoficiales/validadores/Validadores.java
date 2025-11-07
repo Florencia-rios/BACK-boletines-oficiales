@@ -29,27 +29,73 @@ public class Validadores {
     }
 
     public String validarCargo(String cargoIn) {
+        /*
+        //Cargos viejos
         String[] cargos = {
                 "ABSORBIDA", "GERENTE", "Director Titular", "Presidente",
                 "Representante Legal", "Socio Solidario", "Socio Comanditado",
                 "Socio Comanditario", "Socio Gerente", "UNICAMENTE PARA SOCIEDADES DE HECHO Y COLECTIVA",
                 "DENOMINACION ANTERIOR", "ESCINDIDA", "Vicepresidente", "Vicepresidente Primero", "Vicepresidente Segundo",
                 "Vicepresidente Tercero", "Vicepresidente Cuarto", "FUSION", "UTE", "Directivo"
+        };*/
+
+        // Los cargos nuevos van a ser los siguientes:
+        String[] cargos = {
+                "ABSORBIDA",
+                "GERENTE",
+                "DIRECTOR TITULAR",
+                "PRESIDENTE",
+                "REP. LEGAL",
+                "SOCIO SOLIDARIO",
+                "SOCIO COMANDITADO",
+                "SOCIO COMANDITARIO",
+                "SOCIO GERENTE",
+                "SOCIO",
+                "ESCINDIDA/ESCINDENTE",
+                "VICEPRESIDENTE",
+                "VICEPRESIDENTE 1",
+                "VICEPRESIDENTE 2",
+                "VICEPRESIDENTE 3",
+                "VICEPRESIDENTE 4",
+                "VICEPRESIDENTE 5",
+                "FUSIONADA",
+                "UTE",
+                "DIRECTIVO",
+                "CONYUGE",
+                "DUENO",
+                "DIRECTOR",
+                "SOCIO",
+                "TITULAR",
+                "LIQUIDADOR TITULAR",
+                "RELACIONADO",
+                "SOCIO CAPITALISTA",
+                "FISCALIZADOR",
+                "DENOM.ANTERIOR/ACTUAL",
+                "SINDICO",
+                "SINDICO SUPLENTE",
+                "DIRECTOR SUPLENTE",
+                "ADMINISTRADOR SUPLENTE"
         };
 
         String cargoOut = "";
         for (String cargo : cargos) {
-            Pattern pattern = Pattern.compile("\\b" + cargo.toUpperCase() + "\\b");
-            Matcher matcher = pattern.matcher(cargoIn);
+            String patron = "\\b" + cargo.toUpperCase() + "\\b";
+            Pattern pattern = Pattern.compile(patron);
+            Matcher matcher = null;
+
+            matcher = getMatcher(patron, cargo);
+
             if (matcher.find()) {
                 cargoOut = cargo;
                 break;
             }
+            // TODO ver como hacer para verificar mejor si el cargo que se extrajo deberia estar en femenino
             if (cargoOut.isEmpty()) {
                 switch (cargoIn) {
                     case "DIRECTORA TITULAR":
                         cargoOut = "Director Titular";
-                        break;
+                        return cargoOut;
+                       // break;
                     case "PRESIDENTA":
                         cargoOut = "Presidente";
                         break;
@@ -68,24 +114,28 @@ public class Validadores {
                     case "VICEPRESIDENTA":
                         cargoOut = "Vicepresidente";
                         break;
-                    case "VICEPRESIDENTA PRIMERO":
-                        cargoOut = "Vicepresidente Primero";
+                    case "VICEPRESIDENTA 1":
+                        cargoOut = "Vicepresidente 1";
                         break;
-                    case "VICEPRESIDENTA SEGUNDO":
-                        cargoOut = "Vicepresidente Segundo";
+                    case "VICEPRESIDENTA 2":
+                        cargoOut = "Vicepresidente 2";
                         break;
-                    case "VICEPRESIDENTA TERCERO":
-                        cargoOut = "Vicepresidente Tercero";
+                    case "VICEPRESIDENTA 3":
+                        cargoOut = "Vicepresidente 3";
                         break;
-                    case "VICEPRESIDENTA CUARTO":
-                        cargoOut = "Vicepresidente Cuarto";
+                    case "VICEPRESIDENTA 4":
+                        cargoOut = "Vicepresidente 4";
+                        break;
+                    case "VICEPRESIDENTA 5":
+                        cargoOut = "Vicepresidente 5";
                         break;
                     default:
                         cargoOut = "";
                 }
             }
+            // en el caso de Directivo, suele venir con las palabras claves que estanen el string padron
             if(cargoOut.isEmpty()){
-                String patron = "(ADMINISTRADOR TITULAR|SOCIO ADMINISTRADOR|REPRESENTANTE|REPRESENTANTE Y USO DE LA FIRMA)";
+                patron = "(ADMINISTRADOR TITULAR|SOCIO ADMINISTRADOR|REPRESENTANTE|REPRESENTANTE Y USO DE LA FIRMA)";
                 Pattern pattern2 = Pattern.compile(patron);
                 Matcher matcher2 = pattern2.matcher(cargoIn);
                 if (matcher2.find()) {
@@ -93,9 +143,16 @@ public class Validadores {
                     break;
                 }
             }
+
         }
 
         return cargoOut;
+    }
+
+    private Matcher getMatcher(String patron, String secuenceToMatch){
+        Pattern pattern = Pattern.compile(patron);
+
+        return pattern.matcher(secuenceToMatch);
     }
 
     public String validarProvincia(String provIn) {
