@@ -25,18 +25,17 @@ public class NLPBoletinesOficiales {
     private RestTemplate restTemplate;
 
     public ResponseNLP extraerEntidadesBO(String boletinOficial) throws JsonProcessingException {
-        NLPExtraerEntidadesRequest request = new NLPExtraerEntidadesRequest();
-        request.setDocumento(boletinOficial);
 
-        ResponseEntity<ResponseNLP> response = restTemplate.postForEntity(urlBase+urlExtraerEntidadesBO, request, ResponseNLP.class);
+        try {
+            NLPExtraerEntidadesRequest request = new NLPExtraerEntidadesRequest();
+            request.setDocumento(boletinOficial);
 
-       // String responseString = response.getBody();
+            ResponseEntity<ResponseNLP> response = restTemplate.postForEntity(urlBase + urlExtraerEntidadesBO, request, ResponseNLP.class);
 
-      //  ObjectMapper objectMapper = new ObjectMapper();
-
-     //   ResponseNLP responseNLP = objectMapper.readValue(responseString, ResponseNLP.class);
-
-        return response.getBody();
+            return response.getBody();
+        } catch (Exception e){
+            return new ResponseNLP();
+        }
     }
 
     public ResponseNLP extraerEntidadesSoc(String sociedad) throws JsonProcessingException {

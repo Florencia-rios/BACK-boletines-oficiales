@@ -65,7 +65,7 @@ public class BoletinesOficialesService {
         List<Sociedad> responseTodosBoletines = new ArrayList<>();
 
         LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String fechaInsercionBoletin = fechaActual.format(formatter);
 
         for (String sociedad : sociedades) {

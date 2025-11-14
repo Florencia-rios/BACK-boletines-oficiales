@@ -33,6 +33,13 @@ public class BoletinesOficialesController {
     @Autowired
     private RestTemplate restTemplate;
 
+    public void findSociedadByFechaInsercionBoletinNuevosCargos(String fechaInsercionBoletin){
+        List<Object[]> results = sociedadRepository.findSociedadByFechaInsercionBoletinNuevosCargos(fechaInsercionBoletin);
+        List<SociedadDto> sociedadDtos = mapToSociedadDto(results);
+
+        generarArchivosCSV(sociedadDtos);
+    }
+
     public Response procesarBoletinOficial(BoletinesficialesRequest request) throws JsonProcessingException {
 
         Response response = new Response();

@@ -44,4 +44,9 @@ public class BoletinesOficialesRestController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/api/nuevos-cargos")
+    public void obtenerCSVSoloNuevosCargos(@RequestParam String fechaInsercionBoletin){
+        controller.findSociedadByFechaInsercionBoletinNuevosCargos(fechaInsercionBoletin);
+    }
 }
