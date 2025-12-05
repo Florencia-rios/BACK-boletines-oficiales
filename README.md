@@ -14,7 +14,7 @@ Importar el siguiente curl en postman o ejecutarlo en la terminal:
 curl --location 'http://localhost:8083/api/boletines-oficiales' \
 --header 'Content-Type: application/json' \
 --data '{
-"fechaBoletin": <fecha_actual> (formato: dd/mm/yyyy),
+"fechaBoletin": <fecha_actual> (formato: yyyymmdd),
 "boletinesOficiales": [
 <string_base64_sociedad_1>,
 <string_base64_sociedad_2>,
@@ -56,10 +56,13 @@ Entonces, lo único que te queda es copiarlo en postman y ejecutarlo.
 
 ## Luego de ejecutado el programa:
 
-Ingresar a la siguiente url
+Ingresar las siguientes url
 
 ````
-http://localhost:5000/api/download/<nombre_archivo>_<fecha_ejecucion>
+http://localhost:5000/api/download/ALTAS_<fecha_ejecucion>
+````
+````
+http://localhost:5000/api/download/MODIFICACIONES_<fecha_ejecucion>
 ````
 
 Hay dos nombres de archivos disponibles:

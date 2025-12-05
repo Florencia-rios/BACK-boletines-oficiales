@@ -3,6 +3,7 @@ package arg.boletinesoficiales.controller;
 import arg.boletinesoficiales.dto.request.BoletinesficialesRequest;
 import arg.boletinesoficiales.dto.request.NLPGenerarArchivosRequest;
 import arg.boletinesoficiales.dto.request.SoloSociedadesRequest;
+import arg.boletinesoficiales.dto.request.Temporal;
 import arg.boletinesoficiales.dto.response.Response;
 import arg.boletinesoficiales.dto.response.SociedadDto;
 import arg.boletinesoficiales.repository.user.SociedadRepository;
@@ -40,6 +41,24 @@ public class BoletinesOficialesController {
         generarArchivosCSV(sociedadDtos);
     }
 
+    // TODO temporal por errores
+    public Response procesarSociedadesTemporal(Temporal request) throws JsonProcessingException {
+
+        Response response = new Response();
+
+        service.procesarSociedadesTemporal(request.getSociedades(), request.getFechaBoletin());
+
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String fechaInsercionBoletin = fechaActual.format(formatter);
+
+        List<SociedadDto> sociedadDtos = extractedCSV(fechaInsercionBoletin);
+
+        response.setData(sociedadDtos);
+
+        return response;
+    }
+
     public Response procesarBoletinOficial(BoletinesficialesRequest request) throws JsonProcessingException {
 
         Response response = new Response();
@@ -47,7 +66,7 @@ public class BoletinesOficialesController {
         service.procesarBoletinOficial(request.getBoletinesOficiales(), request.getFechaBoletin());
 
         LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String fechaInsercionBoletin = fechaActual.format(formatter);
 
         List<SociedadDto> sociedadDtos = extractedCSV(fechaInsercionBoletin);
@@ -64,7 +83,7 @@ public class BoletinesOficialesController {
         service.procesarSoloSociedades(request.getSociedades(), request.getFechaBoletin());
 
         LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String fechaInsercionBoletin = fechaActual.format(formatter);
 
         List<SociedadDto> sociedadDtos = extractedCSV(fechaInsercionBoletin);

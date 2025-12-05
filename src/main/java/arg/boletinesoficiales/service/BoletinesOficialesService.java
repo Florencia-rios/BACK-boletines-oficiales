@@ -38,14 +38,40 @@ public class BoletinesOficialesService {
     @Autowired
     private NLPBoletinesOficiales nlpBoletinesOficiales;
 
+    // TODO temporal por errores
+    @Transactional
+    public List<Sociedad> procesarSociedadesTemporal(List<List<EntidadesWrapper>> entidadesExtraidas, String fechaBoletin) throws JsonProcessingException {
+        List<Sociedad> responseTodosBoletines = new ArrayList<>();
+
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String fechaInsercionBoletin = fechaActual.format(formatter);
+
+        for (List<EntidadesWrapper> responseNLP : entidadesExtraidas) {
+
+            // y pasarlo a obtenerDataFInal
+            byte[] boBinario = Base64.getDecoder().decode("");
+            ResponseNLP responseNLP1 = new ResponseNLP();
+            responseNLP1.setEntidadesSociedades(responseNLP);
+            List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP1, boBinario, fechaInsercionBoletin, fechaBoletin);
+
+            sociedadRepository.saveAll(dataSociedades);
+
+            responseTodosBoletines.addAll(dataSociedades);
+        }
+
+        return responseTodosBoletines;
+    }
+
     @Transactional
     public List<Sociedad> procesarBoletinOficial(List<String> boletinesOficiales, String fechaBoletin) throws JsonProcessingException {
         List<Sociedad> responseTodosBoletines = new ArrayList<>();
 
         LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String fechaInsercionBoletin = fechaActual.format(formatter);
 
+        // Acá no se procesan boletines oficiales, sino sociedades
         for (String boletinOficial : boletinesOficiales) {
 
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesBO(boletinOficial);
@@ -72,7 +98,6 @@ public class BoletinesOficialesService {
 
             ResponseNLP responseNLP = nlpBoletinesOficiales.extraerEntidadesSoc(sociedad);
             byte[] boBinario = Base64.getDecoder().decode(sociedad);
-
             List<Sociedad> dataSociedades = obetenerDataFinal(responseNLP, boBinario, fechaInsercionBoletin, fechaBoletin);
 
             sociedadRepository.saveAll(dataSociedades);
@@ -88,40 +113,44 @@ public class BoletinesOficialesService {
         // una o mas sociedades secundarias, y las personas o integrantes de la sociedad principal
         List<Sociedad> responseFinal = new ArrayList<>();
 
-        List<EntidadesWrapper> responseNLPEntities = responseNLP.getEntidadesSociedades(); // lista de sociedades con sus respectivas entidades
-        // Itero las sociedades
-        for (EntidadesWrapper entidadesWrapper : responseNLPEntities) {
-            Entities entidadesPorSociedadDeBO = entidadesWrapper.getEntidades();
+        try { // todo mejorar manejo de excepciones, hacer test unitarios y de integracion
+            List<EntidadesWrapper> responseNLPEntities = responseNLP.getEntidadesSociedades(); // lista de sociedades con sus respectivas entidades
+            // Itero las sociedades
+            for (EntidadesWrapper entidadesWrapper : responseNLPEntities) {
+                Entities entidadesPorSociedadDeBO = entidadesWrapper.getEntidades();
 
-            int contador = 0;
+                int contador = 0;
 
-            try {
-                List<SociedadNLP> sociedades = entidadesPorSociedadDeBO.getSociedadNLP();
-                if (sociedades.isEmpty()) {
-                    break;
-                }
-                contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
-
-                for (int i = 0; i < responseFinal.size(); i++) {
-                    System.out.println("ResponseFinal hasta sociedades: " + responseFinal.get(i));
-                }
-
-                SociedadNLP sociedadNLP = sociedades.get(0);
-                List<Persona> personas = entidadesPorSociedadDeBO.getPersonas();
-                List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
-                if (!sociedadNLP.getDisolucion().equals("Si")) {
-                    obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
+                try {
+                    List<SociedadNLP> sociedades = entidadesPorSociedadDeBO.getSociedadNLP();
+                    if (sociedades.isEmpty()) {
+                        break;
+                    }
+                    contador = obtenerDataSociedades(boBinario, fechaInsercionBoletin, fechaBoletin, sociedades, contador, responseFinal);
 
                     for (int i = 0; i < responseFinal.size(); i++) {
-                        System.out.println("ResponseFinal luego de personas: " + responseFinal.get(i));
+                        System.out.println("ResponseFinal hasta sociedades: " + responseFinal.get(i));
                     }
 
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
+                    SociedadNLP sociedadNLP = sociedades.get(0);
+                    List<Persona> personas = entidadesPorSociedadDeBO.getPersonas();
+                    List<Persona> personasOrdPorRel = validarRelacion(personas, sociedadNLP); // este metodo va a ver si hay relaciones, asi las ordeno de manera tal que se aplique bien la relacion
+                    if (!sociedadNLP.getDisolucion().equals("Si")) {
+                        obtenerDataPersonas(boBinario, fechaInsercionBoletin, fechaBoletin, personasOrdPorRel, sociedadNLP, contador, responseFinal);
 
+                        for (int i = 0; i < responseFinal.size(); i++) {
+                            System.out.println("ResponseFinal luego de personas: " + responseFinal.get(i));
+                        }
+
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         return responseFinal;
     }
 
