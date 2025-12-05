@@ -59,10 +59,10 @@ Entonces, lo único que te queda es copiarlo en postman y ejecutarlo.
 Ingresar las siguientes url
 
 ````
-http://localhost:5000/api/download/ALTAS_<fecha_ejecucion>
+http://localhost:8080/api/download/ALTAS_<fecha_ejecucion>
 ````
 ````
-http://localhost:5000/api/download/MODIFICACIONES_<fecha_ejecucion>
+http://localhost:8080/api/download/MODIFICACIONES_<fecha_ejecucion>
 ````
 
 Hay dos nombres de archivos disponibles:
