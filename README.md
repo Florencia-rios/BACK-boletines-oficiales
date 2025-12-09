@@ -39,6 +39,8 @@ curl --location 'http://localhost:8083/api/boletines-oficiales' \
 ...
 ]
 }'
+
+Generame el descargable .json con la respuesta.
 ````
 Ahí te va a generar un archivo json para descargar, que ya tiene el formato del request, es decir:
 ````
@@ -79,3 +81,4 @@ curl --location 'http://localhost:8083/api/nuevos-cargos?fechaInsercionBoletin=2
 ```
 
 Luego de ejecutado, volver al paso anterior.
+
