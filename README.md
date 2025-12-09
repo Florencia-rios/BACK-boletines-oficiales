@@ -71,3 +71,11 @@ Hay dos nombres de archivos disponibles:
 - MODIFICACIONES_<yyyymmdd>
 
 Los mismos se van a descargar automáticamente. Y eso ya lo podrías analizar.
+
+## Luego de la ejecución, para obtener sólo los cargos nuevos, se debe ejecutar el siguiente curl:
+
+```
+curl --location 'http://localhost:8083/api/nuevos-cargos?fechaInsercionBoletin=20251209'
+```
+
+Luego de ejecutado, volver al paso anterior.
